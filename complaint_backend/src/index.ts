@@ -20,8 +20,8 @@ app.get("/", (req: Request, res: Response) => {
 })
 
 // Auth routes (to be implemented in src/routes/auth.ts)
-// import authRoutes from "./routes/auth"
-// app.use("/api/auth", authRoutes)
+ import authRoutes from "./routes/auth"
+ app.use("/api/auth", authRoutes)
 
 
 

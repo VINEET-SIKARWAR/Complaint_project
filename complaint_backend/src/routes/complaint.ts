@@ -1,12 +1,18 @@
 import express from "express";
 import { Response } from "express";
 import upload from "../config/multer";
+import {z} from "zod";
 
 import { authenticate,AuthRequest } from "../middlewares/auth";
 import { PrismaClient } from "@prisma/client";
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+
+export const updateStatusSchema = z.object({
+  status: z.enum(["OPEN", "IN_PROGRESS", "RESOLVED"]),
+});
 
 router.post("/me", authenticate, upload.single("photo"),  async (req: AuthRequest, res: Response)=> {
   try {
@@ -63,7 +69,12 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
     }
 
     const { id } = req.params;
-    const { status } = req.body; // OPEN, IN_PROGRESS, RESOLVED
+     const parsed = updateStatusSchema.safeParse(req.body);
+     if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid status value" });
+    }
+
+    const { status } = parsed.data;
 
     const complaint = await prisma.complaint.update({
       where: { id: Number(id) },

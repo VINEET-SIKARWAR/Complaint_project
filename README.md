@@ -3,7 +3,7 @@
 # Complaint Management Backend 🚀
 
 Backend API for the Complaint Management System, built with **Express + TypeScript + Prisma + PostgreSQL**.
-Supports user authentication, complaint submission, file uploads, and role-based access for staff/admin.
+Supports user authentication, complaint submission, **file uploads with Cloudinary**, backend validation with **Zod**, and role-based access for staff/admin.
 
 ---
 
@@ -13,7 +13,8 @@ Supports user authentication, complaint submission, file uploads, and role-based
 * **TypeScript**
 * **Prisma ORM** (with PostgreSQL / SQLite for dev)
 * **JWT + bcrypt** (authentication)
-* **Multer** (file uploads, local storage)
+* **Zod** (runtime request validation)
+* **Multer + Cloudinary** (file uploads, cloud storage)
 * **CSV Export** (reports)
 
 ---
@@ -27,6 +28,8 @@ complaint-backend/
   ├── src/
   │   ├── index.ts           # Entry point
   │   ├── prisma.ts          # Prisma client
+  │   ├── config/
+  │   │   └── cloudinary.ts  # Cloudinary config
   │   ├── middleware/
   │   │   └── auth.ts        # JWT middleware
   │   ├── routes/
@@ -56,7 +59,12 @@ Create a `.env` file:
 ```
 DATABASE_URL="file:./dev.db"   # or your PostgreSQL URL
 JWT_SECRET="supersecret"
-PORT=5000
+PORT=3000
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-api-key"
+CLOUDINARY_API_SECRET="your-api-secret"
 ```
 
 ### 3. Setup database
@@ -85,11 +93,12 @@ npm start
 ### Auth
 
 * `POST /api/auth/register` – Register new user (`citizen`, `staff`, `admin`)
+  ✅ Validated with **Zod**
 * `POST /api/auth/login` – Login & get JWT
 
 ### Complaints
 
-* `POST /api/complaints` – Submit complaint (with optional photo, citizen only)
+* `POST /api/complaints` – Submit complaint (with optional photo uploaded to **Cloudinary**)
 * `GET /api/complaints` – List complaints (citizen = own, staff/admin = all)
 * `PUT /api/complaints/:id` – Update status (`OPEN` → `IN_PROGRESS` → `RESOLVED`, staff/admin only)
 
@@ -101,10 +110,9 @@ npm start
 
 ## 📸 File Uploads
 
-* Uses **Multer**.
-* Stored in `/uploads` folder.
-* Static serving enabled → access via `/uploads/<filename>`.
-* For production: replace with **Cloudinary** or S3 for persistence.
+* Uses **Multer** with **Cloudinary storage**.
+* Uploaded images are stored in the cloud and return a secure URL.
+* Accessible directly via `photoUrl` field in complaint object.
 
 ---
 
@@ -117,6 +125,9 @@ npm start
   * `DATABASE_URL`
   * `JWT_SECRET`
   * `PORT`
+  * `CLOUDINARY_CLOUD_NAME`
+  * `CLOUDINARY_API_KEY`
+  * `CLOUDINARY_API_SECRET`
 
 ---
 
@@ -125,8 +136,9 @@ npm start
 * [x] User auth (JWT)
 * [x] Complaint CRUD
 * [x] Role-based access
+* [x] Zod validation
+* [x] Cloudinary integration
 * [ ] CSV export
-* [ ] Cloudinary integration
 * [ ] Notifications (email/SMS)
 * [ ] Dashboard analytics
 
@@ -134,4 +146,5 @@ npm start
 
 ## 👨‍💻 Authors
 
-Built during hackathon 2025 by Vineet Sikarwar.
+Built during Hackathon 2025 by **Vineet Sikarwar**.
+

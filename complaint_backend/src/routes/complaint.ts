@@ -55,6 +55,55 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
   }
 });
 
+//  Update complaint status (staff/admin only)
+router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role === "citizen") {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const { id } = req.params;
+    const { status } = req.body; // OPEN, IN_PROGRESS, RESOLVED
+
+    const complaint = await prisma.complaint.update({
+      where: { id: Number(id) },
+      data: { status },
+    });
+
+    res.json({ message: "Status updated", complaint });
+  } catch (error) {
+    console.error("Error updating status:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+// Delete complaint (citizen can delete own, staff/admin can delete any)
+router.delete("/:id", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    
+    const complaint = await prisma.complaint.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!complaint) {
+      return res.status(404).json({ error: "Complaint not found" });
+    }
+
+    if (req.user!.role === "citizen" && complaint.reporterId !== req.user!.userId) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    await prisma.complaint.delete({ where: { id: Number(id) } });
+
+    res.json({ message: "Complaint deleted" });
+  } catch (error) {
+    console.error("Error deleting complaint:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
 
  export default router;
 

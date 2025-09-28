@@ -32,5 +32,29 @@ router.post("/me", authenticate, upload.single("photo"),  async (req: AuthReques
 });
 
 
+//  Get all complaints (citizen → own only, staff/admin → all)
+router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    let complaints;
+
+    if (req.user!.role === "citizen") {
+      complaints = await prisma.complaint.findMany({
+        where: { reporterId: req.user!.userId },
+        orderBy: { createdAt: "desc" },
+      });
+    } else {
+      complaints = await prisma.complaint.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+    }
+
+    res.json(complaints);
+  } catch (error) {
+    console.error("Error fetching complaints:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
  export default router;
 

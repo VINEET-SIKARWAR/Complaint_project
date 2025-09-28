@@ -27,9 +27,10 @@ app.get("/", (req: Request, res: Response) => {
  import complaintRoutes from "./routes/complaint"
 app.use("/api/complaints", complaintRoutes);
 
+//report(csv) route(impllemented in src/routes/report.ts)
+import reportRoutes from "./routes/report"; 
+app.use("/api/reports", reportRoutes);
 
-
-// --- Start server ---
 
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`)

@@ -1,12 +1,14 @@
 import express from "express";
-import upload from "config/multer";
-import { authenticate } from "middlewares/auth";
+import { Response } from "express";
+import upload from "../config/multer";
+
+import { authenticate,AuthRequest } from "../middlewares/auth";
 import { PrismaClient } from "@prisma/client";
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.post("/", authenticate, upload.single("photo"), async (req, res) => {
+router.post("/me", authenticate, upload.single("photo"),  async (req: AuthRequest, res: Response)=> {
   try {
     const { title, description, category, area } = req.body;
     const photoUrl = req.file?.path; // Cloudinary gives URL in .path

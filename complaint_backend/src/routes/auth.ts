@@ -6,8 +6,7 @@ import {z} from "zod";
 
 const router = Router();
 const prisma = new PrismaClient();
-
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 // Zod schemas
 const registerSchema = z.object({
@@ -18,7 +17,7 @@ const registerSchema = z.object({
 });
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -62,30 +61,34 @@ router.post("/register", async (req: Request, res: Response) => {
 });
 
 
-// POST /api/auth/login
-// router.post("/login", async (req: Request, res: Response) => {
-//   try {
-//     const { email, password } = req.body;
+//POST /api/auth/login
+router.post("/login", async (req: Request, res: Response) => {
+  try {
+    const parsed = loginSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
+    }
+    const { email, password } = parsed.data;
 
-//     const user = await prisma.user.findUnique({ where: { email } });
-//     if (!user) {
-//       return res.status(400).json({ error: "Invalid credentials" });
-//     }
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
-//     // compare password
-//     const isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch) {
-//       return res.status(400).json({ error: "Invalid credentials" });
-//     }
+    // compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
-//     // create token
-//     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    // create token
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
 
-//     res.json({ message: "Login successful", token });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: "Something went wrong" });
-//   }
-// });
+    res.json({ message: "Login successful", token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
 
 export default router;

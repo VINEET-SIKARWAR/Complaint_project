@@ -23,6 +23,10 @@ app.get("/", (req: Request, res: Response) => {
  import authRoutes from "./routes/auth"
  app.use("/api/auth", authRoutes)
 
+ //Complaint routes (to be implemented in src/routes/complaint.ts)
+ import complaintRoutes from "./routes/complaint"
+app.use("/api/complaints", complaintRoutes);
+
 
 
 // --- Start server ---

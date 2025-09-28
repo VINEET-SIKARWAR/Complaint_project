@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // POST /api/auth/register
 router.post("/register", async (req: Request, res: Response) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, role } = req.body;
 
     // check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -28,40 +28,45 @@ router.post("/register", async (req: Request, res: Response) => {
         email,
         name,
         password: hashedPassword,
+        role: role || "citizen", // default role is citizen
       },
     });
 
-    res.status(201).json({ message: "User registered", user: { id: user.id, email: user.email } });
+    res.status(201).json({
+      message: "User registered",
+      user: { id: user.id, email: user.email, role: user.role },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
 
 // POST /api/auth/login
-router.post("/login", async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
+// router.post("/login", async (req: Request, res: Response) => {
+//   try {
+//     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return res.status(400).json({ error: "Invalid credentials" });
-    }
+//     const user = await prisma.user.findUnique({ where: { email } });
+//     if (!user) {
+//       return res.status(400).json({ error: "Invalid credentials" });
+//     }
 
-    // compare password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: "Invalid credentials" });
-    }
+//     // compare password
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ error: "Invalid credentials" });
+//     }
 
-    // create token
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+//     // create token
+//     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.json({ message: "Login successful", token });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Something went wrong" });
-  }
-});
+//     res.json({ message: "Login successful", token });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Something went wrong" });
+//   }
+// });
 
 export default router;

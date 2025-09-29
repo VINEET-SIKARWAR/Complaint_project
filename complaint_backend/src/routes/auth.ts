@@ -2,18 +2,20 @@ import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import {z} from "zod";
+import { z } from "zod";
 
 const router = Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET as string;
+
 
 // Zod schemas
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["citizen", "staff", "admin"]).optional(), // default will be citizen
+  role: z.enum(["citizen", "staff", "admin"]).optional(),
+  adminCode: z.string().optional(),
 });
 
 const loginSchema = z.object({
@@ -25,11 +27,11 @@ const loginSchema = z.object({
 router.post("/register", async (req: Request, res: Response) => {
   try {
 
-     const parsed = registerSchema.safeParse(req.body);
+    const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
     }
-    const { email, password, name, role } = parsed.data;
+    const { email, password, name, role, adminCode } = parsed.data;
 
     // check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -40,13 +42,33 @@ router.post("/register", async (req: Request, res: Response) => {
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    //default user
+    let finalRole = "citizen";
+    let staffRequest = false;
+
+
+    // check for admin role request
+    if (role === "admin") {
+      if (adminCode && adminCode === process.env.ADMIN_CODE) {
+        finalRole = "admin";
+      } else {
+        return res.status(403).json({ error: "Invalid admin code" });
+      }
+    }
+
+    // At registration, if user selects "staff":
+    if (role === "staff") {
+      
+      staffRequest = true;
+      finalRole = "citizen"; // still citizen until approved
+    }
     // save new user
     const user = await prisma.user.create({
       data: {
         email,
         name,
         password: hashedPassword,
-        role: role || "citizen", // default role is citizen
+        role: finalRole
       },
     });
 

@@ -16,7 +16,7 @@ app.use("/uploads", express.static("uploads")) // Serve uploaded images
 // --- Routes ---
 // Health check
 app.get("/", (req: Request, res: Response) => {
-  res.json({ message: "Complaint Management Backend is running 🚀" })
+  res.json({ message: "Complaint Management Backend is running " })
 })
 
 // Auth routes (to be implemented in src/routes/auth.ts)
@@ -33,5 +33,5 @@ app.use("/api/reports", reportRoutes);
 
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`)
+  console.log(` Server running on http://localhost:${PORT}`)
 })

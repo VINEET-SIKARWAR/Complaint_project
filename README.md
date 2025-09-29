@@ -47,7 +47,7 @@ complaint-backend/
 ### 1. Clone & install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/VINEET-SIKARWAR/Complaint_project.git
 cd complaint-backend
 npm install
 ```

@@ -31,6 +31,11 @@ app.use("/api/complaints", complaintRoutes);
 import reportRoutes from "./routes/report"; 
 app.use("/api/reports", reportRoutes);
 
+//to promote the citizen to user (to be implemented in src/routes/admin.ts)
+import adminRoutes from "./routes/admin";
+
+app.use("/api/admin", adminRoutes);
+
 
 app.listen(PORT, () => {
   console.log(` Server running on http://localhost:${PORT}`)

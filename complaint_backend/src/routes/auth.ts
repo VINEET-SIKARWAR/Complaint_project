@@ -58,7 +58,7 @@ router.post("/register", async (req: Request, res: Response) => {
 
     // At registration, if user selects "staff":
     if (role === "staff") {
-      
+
       staffRequest = true;
       finalRole = "citizen"; // still citizen until approved
     }
@@ -103,8 +103,20 @@ router.post("/login", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
+   
     // create token
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },  
+      JWT_SECRET!,
+      { expiresIn: "1h" }
+    );
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: { id: user.id, email: user.email, role: user.role } // optional, useful for frontend
+    });
+
 
     res.json({ message: "Login successful", token });
   } catch (err) {

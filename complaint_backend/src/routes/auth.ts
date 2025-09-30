@@ -68,7 +68,8 @@ router.post("/register", async (req: Request, res: Response) => {
         email,
         name,
         password: hashedPassword,
-        role: finalRole
+        role: finalRole,
+        staffRequest
       },
     });
 
@@ -103,10 +104,10 @@ router.post("/login", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
-   
+
     // create token
     const token = jwt.sign(
-      { userId: user.id, role: user.role },  
+      { userId: user.id, role: user.role },
       JWT_SECRET!,
       { expiresIn: "1h" }
     );
@@ -118,7 +119,7 @@ router.post("/login", async (req: Request, res: Response) => {
     });
 
 
-    
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong" });

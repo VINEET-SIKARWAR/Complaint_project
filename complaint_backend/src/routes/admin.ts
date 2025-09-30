@@ -12,12 +12,18 @@ router.put("/promote/:userId", authenticate, async (req: AuthRequest, res: Respo
     if (req.user?.role !== "admin") {
       return res.status(403).json({ error: "Only admin can promote users" });
     }
+ 
+    
 
     const userId = parseInt(req.params.userId);
+
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
+    }
+    if (user.role === "staff") {
+      return res.status(400).json({ message: "User is already promoted" });
     }
 
     // Update role to staff

@@ -43,13 +43,17 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     let complaints;
 
-    if (req.user!.role === "citizen") {
+       if (req.user?.role === "citizen") {
+      // citizen only sees their own
       complaints = await prisma.complaint.findMany({
-        where: { reporterId: req.user!.userId },
+        where: { reporterId: req.user.userId },
+        include: { reporter: { select: { id: true, name: true, email: true } } },
         orderBy: { createdAt: "desc" },
       });
     } else {
+      // staff/admin see all
       complaints = await prisma.complaint.findMany({
+        include: { reporter: { select: { id: true, name: true, email: true } } },
         orderBy: { createdAt: "desc" },
       });
     }

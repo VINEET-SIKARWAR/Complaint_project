@@ -22,7 +22,12 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     }
 
     // Verify token
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number; role: string };
+      const decoded = jwt.verify(token, JWT_SECRET) as {
+      userId: number;
+      role: string;
+      name: string;
+      email: string;
+    };
 
     // Attach decoded info to request
     req.user = decoded;

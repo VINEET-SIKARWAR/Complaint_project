@@ -8,34 +8,44 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
-  provider  = "postgresql"
-  url       = env("CONECTION_POOL_URL")
-  
+  provider = "postgresql"
+  url      = env("CONECTION_POOL_URL")
 }
 
-
 model User {
-  id        Int        @id @default(autoincrement())
-  name      String
-  email     String     @unique
-  password  String
-  role         String      @default("citizen") // citizen | staff | admin
-  staffRequest Boolean     @default(false)     // did user apply for staff?
-  complaints Complaint[]
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  role     String @default("citizen") // citizen | staff | admin
+
+  staffRequest Boolean @default(false) // did user apply for staff?
+
+  // Complaints reported by this user (citizen role)
+  reportedComplaints Complaint[] @relation("Reporter")
+
+  // Complaints assigned to this user (staff role)
+  assignedComplaints Complaint[] @relation("Assignee")
 }
 
 model Complaint {
-  id          Int       @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   title       String
   description String
   category    String
   area        String
-  status      String    @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
+  status      String  @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
   photoUrl    String?
-  reporterId  Int
-  reporter    User      @relation(fields: [reporterId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  // Who reported it (citizen)
+  reporterId Int
+  reporter   User @relation("Reporter", fields: [reporterId], references: [id])
+
+  // Who is assigned (staff)
+  assignedToId Int?
+  assignedTo   User? @relation("Assignee", fields: [assignedToId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

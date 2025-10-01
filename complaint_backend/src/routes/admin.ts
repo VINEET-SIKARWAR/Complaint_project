@@ -39,4 +39,41 @@ router.put("/promote/:userId", authenticate, async (req: AuthRequest, res: Respo
   }
 });
 
+// src/routes/admin.ts
+router.put("/assign/:complaintId", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "admin") {
+      return res.status(403).json({ error: "Only admin can assign tasks" });
+    }
+
+    const { staffId } = req.body;
+    const { complaintId } = req.params;
+
+    // check if staff exists
+    const staff = await prisma.user.findUnique({
+      where: { id: Number(staffId) },
+    });
+
+    if (!staff || staff.role !== "staff") {
+      return res.status(400).json({ error: "Invalid staff member" });
+    }
+
+    // update complaint assignment
+    const updatedComplaint = await prisma.complaint.update({
+      where: { id: Number(complaintId) },
+      data: { assignedToId: staff.id, status: "IN_PROGRESS" },
+      include: {
+        reporter: { select: { name: true, email: true } },
+        assignedTo: { select: { name: true, email: true } },
+      },
+    });
+
+    res.json({ message: "Complaint assigned successfully", complaint: updatedComplaint });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
 export default router;

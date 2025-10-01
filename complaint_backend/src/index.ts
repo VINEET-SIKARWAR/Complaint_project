@@ -33,8 +33,12 @@ app.use("/api/reports", reportRoutes);
 
 //to promote the citizen to user (to be implemented in src/routes/admin.ts)
 import adminRoutes from "./routes/admin";
-
 app.use("/api/admin", adminRoutes);
+
+//to get all citizen who are staff members(to be implementes in src/routes.user.ts)
+import userRoutes from "./routes/user"
+app.use("/api/users",userRoutes)
+
 
 
 app.listen(PORT, () => {

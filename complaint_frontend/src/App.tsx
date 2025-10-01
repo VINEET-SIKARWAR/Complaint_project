@@ -1,11 +1,11 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import StaffRequests from "./components/StaffRequests";
-// import Complaints from "./pages/Complaints";
+import StaffDashboard from "./pages/StaffDashboard";
+import AssignedComplaints from "./pages/AssignedComplaints"; 
 
 function App() {
   return (
@@ -16,10 +16,12 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/staff-requests" element={<StaffRequests />} />
-        {/* <Route path="/complaints" element={<Complaints />} /> */}
+        <Route path="/staff-dashboard" element={<StaffDashboard />} />
+        <Route path="/assigned-complaints" element={<AssignedComplaints />} /> 
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
+

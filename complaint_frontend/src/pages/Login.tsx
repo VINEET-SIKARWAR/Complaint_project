@@ -33,7 +33,9 @@ const Login: React.FC = () => {
       // redirect to dashboard or home
        if (res.data.user.role === "admin") {
         navigate("/admin-dashboard");
-      } else {
+      }else if(res.data.user.role==="staff"){
+        navigate("/staff-dashboard");
+      }else {
         navigate("/dashboard");
       }
     } catch (err: any) {

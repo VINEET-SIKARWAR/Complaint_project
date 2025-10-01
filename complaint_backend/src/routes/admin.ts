@@ -5,6 +5,34 @@ import { AuthRequest,authenticate } from "../middlewares/auth";
 const prisma = new PrismaClient();
 const router = Router();
 
+// GET /api/admin/staff-requests
+router.get("/staff-requests", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    // Only admin can view staff requests
+    if (req.user?.role !== "admin") {
+      return res.status(403).json({ error: "Only admin can view staff requests" });
+    }
+
+    // Find users who requested staff role
+    const requests = await prisma.user.findMany({
+      where: { staffRequest: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        staffRequest: true,
+      },
+      orderBy: { id: "asc" },
+    });
+
+    res.json(requests);
+  } catch (err) {
+    console.error("Error fetching staff requests:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
 // PUT /api/admin/promote/:userId
 router.put("/promote/:userId", authenticate, async (req: AuthRequest, res: Response) => {
   try {

@@ -56,8 +56,10 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
     } else {
       // staff/admin see all
       complaints = await prisma.complaint.findMany({
-        include: { reporter: { select: { id: true, name: true, email: true } },
-       assignedTo: { select: { id: true, name: true, email: true } }, },
+        include: {
+          reporter: { select: { id: true, name: true, email: true } },
+          assignedTo: { select: { id: true, name: true, email: true } },
+        },
         orderBy: { createdAt: "desc" },
       });
     }
@@ -69,14 +71,14 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
   }
 });
 
-//  Update complaint status (staff/admin only)
+// PUT /complaints/:id/status
 router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    if (req.user!.role === "citizen") {
-      return res.status(403).json({ error: "Access denied" });
+    if (req.user?.role === "citizen") {
+      return res.status(403).json({ error: "Citizens cannot update complaint status" });
     }
 
-    const { id } = req.params;
+    const complaintId = parseInt(req.params.id);
     const parsed = updateStatusSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ error: "Invalid status value" });
@@ -84,17 +86,46 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
 
     const { status } = parsed.data;
 
-    const complaint = await prisma.complaint.update({
-      where: { id: Number(id) },
-      data: { status },
+    // find complaint
+    const complaint = await prisma.complaint.findUnique({
+      where: { id: complaintId },
     });
 
-    res.json({ message: "Status updated", complaint });
+    if (!complaint) {
+      return res.status(404).json({ error: "Complaint not found" });
+    }
+
+    // STAFF rules
+    if (req.user?.role === "staff") {
+      if (complaint.assignedToId !== req.user.userId) {
+        return res.status(403).json({ error: "Not authorized to update this complaint" });
+      }
+
+      // staff can only move their assigned complaint forward
+      if (!["IN_PROGRESS", "RESOLVED"].includes(status)) {
+        return res.status(400).json({ error: "Staff can only set status to IN_PROGRESS or RESOLVED" });
+      }
+    }
+
+    // ADMIN rules → can change to anything
+    // (no extra check needed, since citizen already blocked above)
+
+    const updatedComplaint = await prisma.complaint.update({
+      where: { id: complaintId },
+      data: { status },
+      include: {
+        reporter: { select: { name: true, email: true } },
+        assignedTo: { select: { name: true, email: true } },
+      },
+    });
+
+    res.json({ message: "Status updated successfully", complaint: updatedComplaint });
   } catch (error) {
-    console.error("Error updating status:", error);
+    console.error("Error updating complaint status:", error);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
 
 // Delete complaint (citizen can delete own, staff/admin can delete any)
 router.delete("/:id", authenticate, async (req: AuthRequest, res: Response) => {
@@ -122,6 +153,31 @@ router.delete("/:id", authenticate, async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
+// Get complaints assigned to the logged-in staff
+router.get("/assigned", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "staff") {
+      return res.status(403).json({ error: "Only staff can view assigned complaints" });
+    }
+
+    const complaints = await prisma.complaint.findMany({
+      where: { assignedToId: req.user.userId },
+      include: {
+        reporter: { select: { id: true, name: true, email: true } },
+        assignedTo: { select: { id: true, name: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(complaints);
+  } catch (error) {
+    console.error("Error fetching assigned complaints:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
 
 
 export default router;

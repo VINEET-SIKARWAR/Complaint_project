@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import API from "../api/axios";
 import ImageModal from "../components/ImageModal";
+import { BellIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
+
 
 interface Complaint {
     id: number;
@@ -28,20 +31,24 @@ const AdminDashboard: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null); // for modal
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [pendingRequests, setPendingRequests] = useState<number>(0); 
 
     const name = localStorage.getItem("name") || "Admin";
     const email = localStorage.getItem("email") || "No email";
+    const navigate = useNavigate()
 
     // Fetch complaints + staff
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [complaintsRes, staffRes] = await Promise.all([
+                const [complaintsRes, staffRes,requestRes] = await Promise.all([
                     API.get("/complaints"), // Admin sees all complaints
                     API.get("/users/staff"), // Endpoint to get all staff members
+                    API.get("/admin/staff-requests"),//Endpoint to get number of staff request
                 ]);
                 setComplaints(complaintsRes.data);
                 setStaffList(staffRes.data);
+                setPendingRequests(requestRes.data.length);
             } catch (err: any) {
                 setError(err.response?.data?.error || "Failed to load data");
             } finally {
@@ -74,13 +81,28 @@ const AdminDashboard: React.FC = () => {
     return (
         <div className="p-6">
             {/* Profile Card */}
-            <div className="bg-white shadow rounded-lg p-6 mb-6">
+            <div className="bg-white shadow rounded-lg p-6 mb-6 flex justify-between items-center">
+                <div>
                 <h2 className="text-xl font-bold text-gray-800">Welcome, {name}</h2>
                 <p className="text-gray-600">{email}</p>
                 <span className="inline-block mt-2 px-3 py-1 text-sm rounded-full bg-red-100 text-red-600">
                     ADMIN
                 </span>
+                </div>
+                <button
+                    onClick={() => navigate("/staff-requests")}
+                    className="relative p-2 rounded-full hover:bg-gray-100"
+                >
+                    <BellIcon className="h-6 w-6 text-gray-700" />
+                    {pendingRequests > 0 && (
+                        <span className="absolute top-1 right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                            {pendingRequests}
+                        </span>
+                    )}
+                </button>
+
             </div>
+
 
             {/* Complaints Table */}
             <div className="bg-white shadow rounded-lg p-6">
@@ -106,10 +128,10 @@ const AdminDashboard: React.FC = () => {
                                 <td className="px-4 py-2">
                                     <span
                                         className={`px-2 py-1 rounded text-xs ${c.status === "OPEN"
-                                                ? "bg-yellow-100 text-yellow-800"
-                                                : c.status === "IN_PROGRESS"
-                                                    ? "bg-blue-100 text-blue-800"
-                                                    : "bg-green-100 text-green-800"
+                                            ? "bg-yellow-100 text-yellow-800"
+                                            : c.status === "IN_PROGRESS"
+                                                ? "bg-blue-100 text-blue-800"
+                                                : "bg-green-100 text-green-800"
                                             }`}
                                     >
                                         {c.status}
@@ -125,7 +147,7 @@ const AdminDashboard: React.FC = () => {
                                             src={c.photoUrl}
                                             alt="complaint"
                                             className="h-12 w-12 object-cover rounded cursor-pointer hover:opacity-80"
-                                            onClick={() => setSelectedImage(c.photoUrl||null)}
+                                            onClick={() => setSelectedImage(c.photoUrl || null)}
                                         />
                                     ) : (
                                         "No image"

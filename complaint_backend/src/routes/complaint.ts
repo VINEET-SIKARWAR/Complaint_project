@@ -1,9 +1,9 @@
 import express from "express";
 import { Response } from "express";
 import upload from "../config/multer";
-import {z} from "zod";
+import { z } from "zod";
 
-import { authenticate,AuthRequest } from "../middlewares/auth";
+import { authenticate, AuthRequest } from "../middlewares/auth";
 import { PrismaClient } from "@prisma/client";
 
 const router = express.Router();
@@ -14,7 +14,7 @@ export const updateStatusSchema = z.object({
   status: z.enum(["OPEN", "IN_PROGRESS", "RESOLVED"]),
 });
 
-router.post("/me", authenticate, upload.single("photo"),  async (req: AuthRequest, res: Response)=> {
+router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest, res: Response) => {
   try {
     const { title, description, category, area } = req.body;
     const photoUrl = req.file?.path; // Cloudinary gives URL in .path
@@ -43,17 +43,21 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     let complaints;
 
-       if (req.user?.role === "citizen") {
+    if (req.user?.role === "citizen") {
       // citizen only sees their own
       complaints = await prisma.complaint.findMany({
         where: { reporterId: req.user.userId },
-        include: { reporter: { select: { id: true, name: true, email: true } } },
+        include: {
+          reporter: { select: { id: true, name: true, email: true } },
+          assignedTo: { select: { id: true, name: true, email: true } },
+        },
         orderBy: { createdAt: "desc" },
       });
     } else {
       // staff/admin see all
       complaints = await prisma.complaint.findMany({
-        include: { reporter: { select: { id: true, name: true, email: true } } },
+        include: { reporter: { select: { id: true, name: true, email: true } },
+       assignedTo: { select: { id: true, name: true, email: true } }, },
         orderBy: { createdAt: "desc" },
       });
     }
@@ -73,8 +77,8 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
     }
 
     const { id } = req.params;
-     const parsed = updateStatusSchema.safeParse(req.body);
-     if (!parsed.success) {
+    const parsed = updateStatusSchema.safeParse(req.body);
+    if (!parsed.success) {
       return res.status(400).json({ error: "Invalid status value" });
     }
 
@@ -97,7 +101,7 @@ router.delete("/:id", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    
+
     const complaint = await prisma.complaint.findUnique({
       where: { id: Number(id) },
     });
@@ -120,5 +124,5 @@ router.delete("/:id", authenticate, async (req: AuthRequest, res: Response) => {
 });
 
 
- export default router;
+export default router;
 

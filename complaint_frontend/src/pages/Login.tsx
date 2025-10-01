@@ -22,11 +22,20 @@ const Login: React.FC = () => {
       const res = await API.post("/auth/login", formData);
       setMessage(res.data.message);
 
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("name", res.data.user.name);
+      localStorage.setItem("email", res.data.user.email);
+
       // save JWT in localStorage
       localStorage.setItem("token", res.data.token);
 
       // redirect to dashboard or home
-      navigate("/dashboard");
+       if (res.data.user.role === "admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err: any) {
       setMessage(err.response?.data?.error || "Invalid credentials");
     }
@@ -62,7 +71,7 @@ const Login: React.FC = () => {
 
         <button
           type="submit"
-            className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-semibold shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-semibold shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           Login
         </button>

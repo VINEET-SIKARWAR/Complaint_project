@@ -33,6 +33,38 @@ router.get("/staff-requests", authenticate, async (req: AuthRequest, res: Respon
   }
 });
 
+// PUT /api/admin/reject/:userId
+router.put("/reject/:userId", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "admin") {
+      return res.status(403).json({ error: "Only admin can reject requests" });
+    }
+
+    const userId = parseInt(req.params.userId);
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!user.staffRequest) {
+      return res.status(400).json({ message: "No pending request for this user" });
+    }
+
+    // Reset staffRequest
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { staffRequest: false },
+    });
+
+    res.json({ message: "Request rejected", user: updatedUser });
+  } catch (err) {
+    console.error("Error rejecting user:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
 // PUT /api/admin/promote/:userId
 router.put("/promote/:userId", authenticate, async (req: AuthRequest, res: Response) => {
   try {

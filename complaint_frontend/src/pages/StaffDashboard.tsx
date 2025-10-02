@@ -5,18 +5,7 @@ import ProfileCard from "../components/ProfileCard";
 import ImageModal from "../components/ImageModal";
 import { BellIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
-
-interface Complaint {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-  category: string;
-  area: string;
-  photoUrl?: string;
-  createdAt: string;
-  reporter: { name: string; email: string };
-}
+import { Complaint } from "../types/Complaint";
 
 const StaffDashboard: React.FC = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);

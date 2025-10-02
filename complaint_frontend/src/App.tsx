@@ -6,6 +6,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import StaffRequests from "./components/StaffRequests";
 import StaffDashboard from "./pages/StaffDashboard";
 import AssignedComplaints from "./pages/AssignedComplaints"; 
+import NewComplaint from "./pages/NewComplaint";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/staff-requests" element={<StaffRequests />} />
         <Route path="/staff-dashboard" element={<StaffDashboard />} />
         <Route path="/assigned-complaints" element={<AssignedComplaints />} /> 
+        <Route path ="/new-complaint" element={<NewComplaint/>}/>
       </Routes>
     </BrowserRouter>
   );

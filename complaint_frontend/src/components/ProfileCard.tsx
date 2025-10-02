@@ -1,11 +1,21 @@
+// src/components/ProfileCard.tsx
+import React from "react";
+
 interface ProfileCardProps {
   name: string;
   email: string;
   role: "admin" | "staff" | "citizen";
-  profileUrl?: string; 
+  profileUrl?: string;
+  children?: React.ReactNode; 
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ name, email, role, profileUrl }) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({
+  name,
+  email,
+  role,
+  profileUrl,
+  children,
+}) => {
   return (
     <div className="bg-white shadow rounded-lg p-6 mb-6 flex items-center justify-between">
       <div className="flex items-center space-x-4">
@@ -32,9 +42,14 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ name, email, role, profileUrl
           </span>
         </div>
       </div>
+
+      
+      <div>{children}</div>
     </div>
   );
 };
+
 export default ProfileCard;
+
 
 

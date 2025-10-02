@@ -3,20 +3,9 @@ import API from "../api/axios";
 import ImageModal from "../components/ImageModal";
 import { BellIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
+import ProfileCard from "../components/ProfileCard";
+import { Complaint } from "../types/Complaint";
 
-
-interface Complaint {
-    id: number;
-    title: string;
-    description: string;
-    status: string;
-    category: string;
-    area: string;
-    photoUrl?: string;
-    createdAt: string;
-    reporter: { name: string; email: string };
-    assignedTo?: { name: string; email: string }; // show assigned staff if available
-}
 
 interface Staff {
     id: number;
@@ -31,17 +20,18 @@ const AdminDashboard: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null); // for modal
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [pendingRequests, setPendingRequests] = useState<number>(0); 
+    const [pendingRequests, setPendingRequests] = useState<number>(0);
 
     const name = localStorage.getItem("name") || "Admin";
     const email = localStorage.getItem("email") || "No email";
+    const profileUrl = localStorage.getItem("profileUrl") || "";
     const navigate = useNavigate()
 
     // Fetch complaints + staff
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [complaintsRes, staffRes,requestRes] = await Promise.all([
+                const [complaintsRes, staffRes, requestRes] = await Promise.all([
                     API.get("/complaints"), // Admin sees all complaints
                     API.get("/users/staff"), // Endpoint to get all staff members
                     API.get("/admin/staff-requests"),//Endpoint to get number of staff request
@@ -81,14 +71,7 @@ const AdminDashboard: React.FC = () => {
     return (
         <div className="p-6">
             {/* Profile Card */}
-            <div className="bg-white shadow rounded-lg p-6 mb-6 flex justify-between items-center">
-                <div>
-                <h2 className="text-xl font-bold text-gray-800">Welcome, {name}</h2>
-                <p className="text-gray-600">{email}</p>
-                <span className="inline-block mt-2 px-3 py-1 text-sm rounded-full bg-red-100 text-red-600">
-                    ADMIN
-                </span>
-                </div>
+            <ProfileCard name={name} email={email} role="admin" profileUrl={profileUrl}>
                 <button
                     onClick={() => navigate("/staff-requests")}
                     className="relative p-2 rounded-full hover:bg-gray-100"
@@ -100,8 +83,7 @@ const AdminDashboard: React.FC = () => {
                         </span>
                     )}
                 </button>
-
-            </div>
+            </ProfileCard>
 
 
             {/* Complaints Table */}

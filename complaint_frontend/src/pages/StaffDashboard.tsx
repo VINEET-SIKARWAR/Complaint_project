@@ -52,6 +52,7 @@ const StaffDashboard: React.FC = () => {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
+
   if (loading) return <p className="text-center mt-10">Loading complaints...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 

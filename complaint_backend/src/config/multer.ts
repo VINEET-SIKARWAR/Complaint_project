@@ -15,7 +15,15 @@ const storage = new CloudinaryStorage({
         public_id: () => string;
     },
 });
+const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const allowed = ["image/jpeg", "image/jpg", "image/png"];
+    if (allowed.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error("Only JPG, JPEG, and PNG formats are allowed"));
+    }
+};
 
-const upload = multer({ storage });
+const upload = multer({ storage,fileFilter});
 
 export default upload;

@@ -81,7 +81,7 @@ const AdminDashboard: React.FC = () => {
   // Download CSV report
   const downloadCSV = async () => {
     try {
-      const res = await API.get("/admin/reports/csv", { responseType: "blob" });
+      const res = await API.get("/reports/csv", { responseType: "blob" });
 
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");

@@ -8,80 +8,118 @@ const router = Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
+// ✅ Zod schemas
+const registerSchema = z
+  .object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    role: z.enum(["citizen", "staff", "admin"]).default("citizen"),
+    adminCode: z.string().optional(),
+    hostelId: z.string().optional(), // required for staff/admin
+  })
+  .refine(
+    (data) => {
+      if (data.role === "admin" || data.role === "staff") {
+        return !!data.hostelId; // must provide hostelId
+      }
+      return true;
+    },
+    {
+      message: "Hostel is required for staff and admin",
+      path: ["hostelId"],
+    }
+  );
 
-// Zod schemas
-const registerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["citizen", "staff", "admin"]).optional(),
-  adminCode: z.string().optional(),
-});
-
+// ✅ Login Schema
 const loginSchema = z.object({
-  email: z.email("Invalid email address"),
+  email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-// POST /api/auth/register
+// ---------------- REGISTER ----------------
 router.post("/register", async (req: Request, res: Response) => {
   try {
-
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ errors: parsed.error.flatten().fieldErrors });
+      return res
+        .status(400)
+        .json({ errors: parsed.error.flatten().fieldErrors });
     }
-    const { email, password, name, role, adminCode } = parsed.data;
 
-    // check if user already exists
+    const { email, password, name, role, adminCode, hostelId } = parsed.data;
+
+    //  check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ error: "User already exists" });
     }
 
-    // hash password
+    //  hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    //default user
-    let finalRole = "citizen";
+    // Default values
+    let finalRole: "citizen" | "staff" | "admin" = "citizen";
     let staffRequest = false;
+    let finalHostelId: number | null = null;
 
-
-    // check for admin role request
+    // If Admin → validate hostel + adminCode
     if (role === "admin") {
+      if (!hostelId) {
+        return res
+          .status(400)
+          .json({ error: "Hostel is required for admin role" });
+      }
+
       if (adminCode && adminCode === process.env.ADMIN_CODE) {
         finalRole = "admin";
+        finalHostelId = Number(hostelId);
       } else {
         return res.status(403).json({ error: "Invalid admin code" });
       }
     }
 
-    // At registration, if user selects "staff":
+    // If Staff → request staff approval
     if (role === "staff") {
-
+      if (!hostelId) {
+        return res
+          .status(400)
+          .json({ error: "Hostel is required for staff role" });
+      }
       staffRequest = true;
       finalRole = "citizen"; // still citizen until approved
+      finalHostelId = Number(hostelId);
     }
-    // save new user
+
+    // Save new user
     const user = await prisma.user.create({
       data: {
         email,
         name,
         password: hashedPassword,
         role: finalRole,
-        staffRequest
+        hostelId: finalHostelId,
+        staffRequest,
       },
     });
 
     res.status(201).json({
-      message: "User registered",
-      user: { id: user.id, email: user.email, role: user.role },
+      message: "User registered successfully",
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        hostelId: user.hostelId,
+      },
     });
   } catch (err) {
-    console.error(err);
+    console.error("Error registering user:", err);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
+
 
 
 //POST /api/auth/login
@@ -107,24 +145,26 @@ router.post("/login", async (req: Request, res: Response) => {
     const token = jwt.sign(
       {
         userId: user.id,
-        role: user.role,
+        role: user.role as "citizen" | "staff" | "admin" | "chief_admin",
         name: user.name,
         email: user.email,
+        hostelId: user.hostelId ?? null,
       },
       process.env.JWT_SECRET as string,
       { expiresIn: "1d" }
     );
 
-   res.json({
-  message: "Login successful",
-  token,
-  user: {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  },
-});
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        hostelId:user.hostelId,
+      },
+    });
 
 
 

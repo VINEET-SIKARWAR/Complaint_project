@@ -5,7 +5,13 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 
 // Custom type so req.user is recognized in TypeScript
 export interface AuthRequest extends Request {
-  user?: { userId: number; role: string };
+  user?: {
+    userId: number;
+    role: string;
+    name: string;
+    email: string;
+    hostelId?: number | null;
+  };
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -22,17 +28,18 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     }
 
     // Verify token
-      const decoded = jwt.verify(token, JWT_SECRET) as {
+    const decoded = jwt.verify(token, JWT_SECRET) as {
       userId: number;
       role: string;
       name: string;
       email: string;
+      hostelId?: number | null;
     };
 
     // Attach decoded info to request
     req.user = decoded;
 
-    next(); 
+    next();
   } catch (err) {
     console.error(err);
     res.status(401).json({ error: "Invalid or expired token" });

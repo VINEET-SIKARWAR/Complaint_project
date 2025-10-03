@@ -44,7 +44,7 @@ router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest
         reporterId: req.user!.userId,
         hostelId: Number(hostelId)
       },
-        include: {
+      include: {
         reporter: { select: { id: true, name: true, email: true } },
         hostel: { select: { id: true, name: true } }
       }
@@ -75,9 +75,10 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
         },
         orderBy: { createdAt: "desc" },
       });
-    } else {
-      // staff/admin see all
+    } else if (req.user?.role === "admin") {
+      // staff/admin see all complaints releted to their hostel
       complaints = await prisma.complaint.findMany({
+        where: { hostelId: req.user.hostelId },
         include: {
           reporter: { select: { id: true, name: true, email: true } },
           assignedTo: { select: { id: true, name: true, email: true } },
@@ -85,9 +86,30 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
         },
         orderBy: { createdAt: "desc" },
       });
+    } else if (req.user?.role === "chief_admin") {
+      // chief_admin sees all complaints
+      complaints = await prisma.complaint.findMany({
+        include: {
+          reporter: { select: { id: true, name: true, email: true } },
+          assignedTo: { select: { id: true, name: true, email: true } },
+          hostel: { select: { id: true, name: true } }
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    } else {
+      // staff → assigned complaints
+      complaints = await prisma.complaint.findMany({
+        where: { assignedToId: req.user!.userId },
+        include: {
+          reporter: { select: { id: true, name: true, email: true } },
+          hostel: { select: { id: true, name: true } }
+        },
+        orderBy: { createdAt: "desc" },
+      });
     }
 
     res.json(complaints);
+
   } catch (error) {
     console.error("Error fetching complaints:", error);
     res.status(500).json({ error: "Something went wrong" });

@@ -35,9 +35,13 @@ app.use("/api/reports", reportRoutes);
 import adminRoutes from "./routes/admin";
 app.use("/api/admin", adminRoutes);
 
-//to get all citizen who are staff members(to be implementes in src/routes.user.ts)
+//to get all citizen who are staff members(to be implementes in src/routes/user.ts)
 import userRoutes from "./routes/user"
 app.use("/api/users",userRoutes)
+
+//to fetch all hostel data (to be implemented in src/routes/hostel.ts)
+import hostelRoutes from "./routes/hostel"
+app.use("/api/hostel",hostelRoutes)
 
 
 

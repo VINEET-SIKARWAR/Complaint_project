@@ -16,8 +16,23 @@ export const updateStatusSchema = z.object({
 
 router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, category, area } = req.body;
+    const { title, description, category, area, hostelId } = req.body;
     const photoUrl = req.file?.path; // Cloudinary gives URL in .path
+
+    if (!title || !description || !category || !area || !hostelId) {
+      return res.status(400).json({ error: "All fields including hostelId are required" });
+    }
+    const hostelIdNum = Number(hostelId);
+    if (isNaN(hostelIdNum)) {
+      return res.status(400).json({ error: "Invalid hostelId format" });
+    }
+
+
+    // ensure hostel exists
+    const hostel = await prisma.hostel.findUnique({ where: { id: Number(hostelId) } });
+    if (!hostel) {
+      return res.status(404).json({ error: "Invalid hostel selected" });
+    }
 
     const complaint = await prisma.complaint.create({
       data: {
@@ -27,8 +42,14 @@ router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest
         area,
         photoUrl,
         reporterId: req.user!.userId,
+        hostelId: Number(hostelId)
       },
+        include: {
+        reporter: { select: { id: true, name: true, email: true } },
+        hostel: { select: { id: true, name: true } }
+      }
     });
+
 
     res.status(201).json({ message: "Complaint created", complaint });
   } catch (error) {

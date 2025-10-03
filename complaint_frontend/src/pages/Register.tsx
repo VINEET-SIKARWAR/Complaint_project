@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from "../api/axios";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({
         name: "",
@@ -8,9 +8,22 @@ const Register: React.FC = () => {
         password: "",
         role: "citizen",
         adminCode: "",
+        hostelId:"",
     });
 
     const [message, setMessage] = useState("");
+    const [hostels, setHostels] = useState<{ id: number; name: string }[]>([]);
+    useEffect(() => {
+        const fetchHostels = async () => {
+            try {
+                const res = await API.get("/hostel"); // backend route we created
+                setHostels(res.data);
+            } catch (err) {
+                console.error("Failed to fetch hostels", err);
+            }
+        };
+        fetchHostels();
+    }, []);
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -21,12 +34,19 @@ const Register: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const payload = {
+                ...formData,
+                hostelId: formData.hostelId ? Number(formData.hostelId) : undefined,
+            };
             const res = await API.post("/auth/register", formData);
             setMessage(res.data.message);
         } catch (err: any) {
             setMessage(err.response?.data?.error || "Something went wrong");
         }
     };
+
+
+
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-50">
@@ -120,6 +140,22 @@ const Register: React.FC = () => {
                         />
                     </div>
                 )}
+                <div>
+                    <select
+                        name="hostelId"
+                        value={formData.hostelId}
+                        onChange={handleChange}
+                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        required
+                    >
+                        <option value="">-- Select Hostel --</option>
+                        {hostels.map((h) => (
+                            <option key={h.id} value={h.id}>
+                                {h.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
                 {/* Submit */}
                 <button

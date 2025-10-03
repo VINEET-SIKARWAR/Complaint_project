@@ -71,6 +71,7 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
         include: {
           reporter: { select: { id: true, name: true, email: true } },
           assignedTo: { select: { id: true, name: true, email: true } },
+          hostel: { select: { id: true, name: true } },
         },
         orderBy: { createdAt: "desc" },
       });
@@ -80,6 +81,7 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
         include: {
           reporter: { select: { id: true, name: true, email: true } },
           assignedTo: { select: { id: true, name: true, email: true } },
+          hostel: { select: { id: true, name: true } },
         },
         orderBy: { createdAt: "desc" },
       });

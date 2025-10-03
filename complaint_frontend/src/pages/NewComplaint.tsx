@@ -1,17 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
+
+interface Hostel {
+  id: number;
+  name: string;
+}
 const NewComplaint: React.FC = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [area, setArea] = useState("");
+  const [hostelId, setHostelId] = useState<number | "">("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [error, setError] = useState("");
+  const [hostels, setHostels] = useState<Hostel[]>([]);
   const navigate = useNavigate();
 
   const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+
+
+  useEffect(() => {
+    const fetchHostels = async () => {
+      try {
+        const res = await API.get("/hostel"); 
+        setHostels(res.data);
+      } catch (err: any) {
+        console.error("Failed to load hostels:", err);
+      }
+    };
+    fetchHostels();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -36,13 +56,14 @@ const NewComplaint: React.FC = () => {
       formData.append("description", description);
       formData.append("category", category);
       formData.append("area", area);
+      formData.append("hostelId", hostelId.toString())
       if (photo) formData.append("photo", photo);
 
       await API.post("/complaints/me", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      navigate("/dashboard"); 
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to register complaint");
     }
@@ -84,6 +105,20 @@ const NewComplaint: React.FC = () => {
           className="w-full border p-2 rounded"
           required
         />
+
+        <select
+          value={hostelId}
+          onChange={(e) => setHostelId(Number(e.target.value))}
+          className="w-full border p-2 rounded"
+          required
+        >
+          <option value="">Select Hostel</option>
+          {hostels.map((h) => (
+            <option key={h.id} value={h.id}>
+              {h.name}
+            </option>
+          ))}
+        </select>
 
         {/* File upload with validation */}
         <div>

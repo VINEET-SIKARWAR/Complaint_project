@@ -18,7 +18,8 @@ model User {
   name     String
   email    String @unique
   password String
-  role     String @default("citizen") // citizen | staff | admin
+  // citizen | staff | admin (warden) | chief_admin
+  role     String @default("citizen") // citizen | staff | admin|chief admin
 
   staffRequest Boolean @default(false) // did user apply for staff?
 
@@ -27,6 +28,20 @@ model User {
 
   // Complaints assigned to this user (staff role)
   assignedComplaints Complaint[] @relation("Assignee")
+
+  // If this user is an Admin/Warden, link them to a Hostel
+  hostelId Int?
+  hostel   Hostel? @relation(fields: [hostelId], references: [id])
+}
+
+model Hostel {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  block String? // optional: block number/name
+
+  // Relations
+  admins     User[] // wardens for this hostel
+  complaints Complaint[]
 }
 
 model Complaint {
@@ -45,6 +60,10 @@ model Complaint {
   // Who is assigned (staff)
   assignedToId Int?
   assignedTo   User? @relation("Assignee", fields: [assignedToId], references: [id])
+
+  // Which hostel the complaint belongs to (nullable → misc)
+  hostelId Int?
+  hostel   Hostel? @relation(fields: [hostelId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

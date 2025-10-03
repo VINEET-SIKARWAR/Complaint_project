@@ -7,6 +7,7 @@ import StaffRequests from "./components/StaffRequests";
 import StaffDashboard from "./pages/StaffDashboard";
 import AssignedComplaints from "./pages/AssignedComplaints"; 
 import NewComplaint from "./pages/NewComplaint";
+import ChiefAdminDashboard from "./pages/ChiefAdminDashboard";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/staff-dashboard" element={<StaffDashboard />} />
         <Route path="/assigned-complaints" element={<AssignedComplaints />} /> 
         <Route path ="/new-complaint" element={<NewComplaint/>}/>
+        <Route path="/chief_admin-dashboard" element={<ChiefAdminDashboard/>}/>
       </Routes>
     </BrowserRouter>
   );

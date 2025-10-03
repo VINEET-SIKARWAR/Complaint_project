@@ -46,7 +46,8 @@ router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest
       },
       include: {
         reporter: { select: { id: true, name: true, email: true } },
-        hostel: { select: { id: true, name: true } }
+        hostel: { select: { id: true, name: true } },
+
       }
     });
 
@@ -102,6 +103,7 @@ router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
         where: { assignedToId: req.user!.userId },
         include: {
           reporter: { select: { id: true, name: true, email: true } },
+          assignedTo: { select: { id: true, name: true, email: true } },
           hostel: { select: { id: true, name: true } }
         },
         orderBy: { createdAt: "desc" },

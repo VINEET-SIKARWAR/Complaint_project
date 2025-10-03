@@ -8,14 +8,15 @@ const router = Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-// ✅ Zod schemas
+//  Zod schemas
 const registerSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    role: z.enum(["citizen", "staff", "admin"]).default("citizen"),
+    role: z.enum(["citizen", "staff", "admin","chief_admin"]).default("citizen"),
     adminCode: z.string().optional(),
+    chiefAdminCode: z.string().optional(),
     hostelId: z.string().optional(), // required for staff/admin
   })
   .refine(
@@ -31,7 +32,7 @@ const registerSchema = z
     }
   );
 
-// ✅ Login Schema
+//  Login Schema
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -47,7 +48,7 @@ router.post("/register", async (req: Request, res: Response) => {
         .json({ errors: parsed.error.flatten().fieldErrors });
     }
 
-    const { email, password, name, role, adminCode, hostelId } = parsed.data;
+    const { email, password, name, role, adminCode, hostelId,chiefAdminCode} = parsed.data;
 
     //  check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -59,7 +60,7 @@ router.post("/register", async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Default values
-    let finalRole: "citizen" | "staff" | "admin" = "citizen";
+    let finalRole: "citizen" | "staff" | "admin"|"chief_admin" = "citizen";
     let staffRequest = false;
     let finalHostelId: number | null = null;
 
@@ -89,6 +90,17 @@ router.post("/register", async (req: Request, res: Response) => {
       staffRequest = true;
       finalRole = "citizen"; // still citizen until approved
       finalHostelId = Number(hostelId);
+    }
+
+
+    //  Chief Admin
+    if (role === "chief_admin") {
+      if (chiefAdminCode && chiefAdminCode === process.env.CHIEF_ADMIN_CODE) {
+        finalRole = "chief_admin";
+        finalHostelId = null; // chief admin oversees all hostels
+      } else {
+        return res.status(403).json({ error: "Invalid chief admin code" });
+      }
     }
 
     // Save new user

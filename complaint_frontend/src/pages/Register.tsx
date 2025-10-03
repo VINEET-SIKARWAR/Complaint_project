@@ -8,7 +8,8 @@ const Register: React.FC = () => {
         password: "",
         role: "citizen",
         adminCode: "",
-        hostelId:"",
+        chiefAdminCode: "",
+        hostelId: "",
     });
 
     const [message, setMessage] = useState("");
@@ -121,41 +122,82 @@ const Register: React.FC = () => {
                         <option value="citizen">Citizen</option>
                         <option value="staff">Request Staff</option>
                         <option value="admin">Admin</option>
+                        <option value="chief_admin">Chief Admin</option>
                     </select>
                 </div>
 
-                {/* Admin Code */}
+                {/* Admin Code + Hostel */}
                 {formData.role === "admin" && (
+                    <>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Admin Code
+                            </label>
+                            <input
+                                type="text"
+                                name="adminCode"
+                                placeholder="Enter admin code"
+                                value={formData.adminCode}
+                                onChange={handleChange}
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            />
+                        </div>
+                        <div>
+                            <select
+                                name="hostelId"
+                                value={formData.hostelId}
+                                onChange={handleChange}
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                required
+                            >
+                                <option value="">-- Select Hostel --</option>
+                                {hostels.map((h) => (
+                                    <option key={h.id} value={h.id}>
+                                        {h.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </>
+                )}
+
+                {/* Staff Hostel */}
+                {formData.role === "staff" && (
+                    <div>
+                        <select
+                            name="hostelId"
+                            value={formData.hostelId}
+                            onChange={handleChange}
+                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required
+                        >
+                            <option value="">-- Select Hostel --</option>
+                            {hostels.map((h) => (
+                                <option key={h.id} value={h.id}>
+                                    {h.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                {/* Chief Admin Code */}
+                {formData.role === "chief_admin" && (
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
-                            Admin Code
+                            Chief Admin Code
                         </label>
                         <input
                             type="text"
-                            name="adminCode"
-                            placeholder="Enter admin code"
-                            value={formData.adminCode}
+                            name="chiefAdminCode"
+                            placeholder="Enter chief admin code"
+                            value={formData.chiefAdminCode}
                             onChange={handleChange}
                             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required
                         />
                     </div>
                 )}
-                <div>
-                    <select
-                        name="hostelId"
-                        value={formData.hostelId}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        required
-                    >
-                        <option value="">-- Select Hostel --</option>
-                        {hostels.map((h) => (
-                            <option key={h.id} value={h.id}>
-                                {h.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
 
                 {/* Submit */}
                 <button

@@ -29,7 +29,7 @@ model User {
   // Complaints assigned to this user (staff role)
   assignedComplaints Complaint[] @relation("Assignee")
 
-  // If this user is an Admin/Warden, link them to a Hostel
+  // If this user is an Admin/Warden/staff, link them to a Hostel
   hostelId Int?
   hostel   Hostel? @relation(fields: [hostelId], references: [id])
 }

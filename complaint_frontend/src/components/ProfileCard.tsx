@@ -4,7 +4,7 @@ import React from "react";
 interface ProfileCardProps {
   name: string;
   email: string;
-  role: "admin" | "staff" | "citizen";
+  role: "admin" | "staff" | "citizen"| "chief_admin";
   profileUrl?: string;
   children?: React.ReactNode; 
 }

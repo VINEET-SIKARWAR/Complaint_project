@@ -83,6 +83,7 @@ const StaffDashboard: React.FC = () => {
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Category</th>
               <th className="px-4 py-2">Area</th>
+              <th className="px-4 py-2">Hostel</th>
               <th className="px-4 py-2">Status</th>
               <th className="px-4 py-2">Reporter</th>
               <th className="px-4 py-2">Image</th>
@@ -94,6 +95,7 @@ const StaffDashboard: React.FC = () => {
                 <td className="px-4 py-2">{c.title}</td>
                 <td className="px-4 py-2">{c.category}</td>
                 <td className="px-4 py-2">{c.area}</td>
+                <td className="px-4 py-2">{c.hostel?.name || "N/A"}</td>
                 <td className="px-4 py-2">
                   <span
                     className={`px-2 py-1 rounded text-xs ${c.status === "IN_PROGRESS"

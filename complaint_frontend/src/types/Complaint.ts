@@ -9,5 +9,9 @@ export interface Complaint {
   photoUrl?: string;
   createdAt?: string;
   reporter?: { name: string; email: string };
-   assignedTo?: { name: string; email: string }; // show assigned staff if available
+  assignedTo?: { name: string; email: string }; // show assigned staff if available
+  hostel?: {
+    id: number;
+    name: string;
+  };
 }

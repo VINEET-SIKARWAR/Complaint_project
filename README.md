@@ -40,48 +40,48 @@ json2csv (report export)
 - │   └── seed.ts               # Hostel seeding
 - ├── src/
 - │   ├── config/               # Config files
-│   │   ├── cloudinary.ts
-│   │   └── multer.ts
-│   ├── middlewares/
-│   │   └── auth.ts           # JWT auth middleware
-│   ├── routes/               # Express routes
-│   │   ├── admin.ts
-│   │   ├── auth.ts
-│   │   ├── complaint.ts
-│   │   ├── hostel.ts
-│   │   ├── report.ts
-│   │   └── user.ts
-│   └── index.ts              # App entry point
-├── package.json
-└── tsconfig.json
+- │   │   ├── cloudinary.ts
+- │   │   └── multer.ts
+- │    ├── middlewares/
+- │   │   └── auth.ts           # JWT auth middleware
+- │   ├── routes/               # Express routes
+- │   │   ├── admin.ts
+- │   │   ├── auth.ts
+- │   │   ├── complaint.ts
+- │   │   ├── hostel.ts
+- │   │   ├── report.ts
+- │   │   └── user.ts
+- │   └── index.ts              # App entry point
+- ├── package.json
+- └── tsconfig.json
 
 Frontend (complaint_frontend/)
 complaint_frontend/
-├── public/
-├── src/
-│   ├── api/
-│   │   └── axios.ts          # Axios instance with JWT
-│   ├── components/           # Reusable UI
-│   │   ├── ComplaintActions.tsx
-│   │   ├── ImageModal.tsx
-│   │   ├── ProfileCard.tsx
-│   │   └── StaffRequestCard.tsx
-│   ├── pages/                # Pages (per role)
-│   │   ├── AdminDashboard.tsx
-│   │   ├── AssignedComplaints.tsx
-│   │   ├── ChiefAdminDashboard.tsx
-│   │   ├── Dashboard.tsx     # Citizen
-│   │   ├── Login.tsx
-│   │   ├── NewComplaint.tsx
-│   │   ├── Register.tsx
-│   │   └── StaffDashboard.tsx
-│   ├── types/
-│   │   └── Complaint.ts      # Shared types
-│   ├── App.tsx
-│   ├── index.css
-│   └── main.tsx
-├── package.json
-└── tsconfig.json
+- ├── public/
+- ├── src/
+- │   ├── api/
+- │   │   └── axios.ts          # Axios instance with JWT
+- │   ├── components/           # Reusable UI
+- │   │   ├── ComplaintActions.tsx
+- │   │   ├── ImageModal.tsx
+- │   │   ├── ProfileCard.tsx
+- │   │   └── StaffRequestCard.tsx
+- │   ├── pages/                # Pages (per role)
+- │   │   ├── AdminDashboard.tsx
+- │   │   ├── AssignedComplaints.tsx
+- │   │   ├── ChiefAdminDashboard.tsx
+- │   │   ├── Dashboard.tsx     # Citizen
+- │   │   ├── Login.tsx
+- │   │   ├── NewComplaint.tsx
+- │   │   ├── Register.tsx
+- │   │   └── StaffDashboard.tsx
+- │   ├── types/
+- │   │   └── Complaint.ts      # Shared types
+- │   ├── App.tsx
+- │   ├── index.css
+- │   └── main.tsx
+- ├── package.json
+- └── tsconfig.json
 
 🔧 Setup Instructions
 Backend

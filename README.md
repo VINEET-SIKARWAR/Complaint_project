@@ -31,15 +31,15 @@ Zod (runtime request validation)
 
 json2csv (report export)
 
-📂 Project Structure
-Backend (complaint_backend/)
-complaint_backend/
-├── prisma/
-│   ├── migrations/           # DB migrations
-│   ├── schema.prisma         # Prisma schema
-│   └── seed.ts               # Hostel seeding
-├── src/
-│   ├── config/               # Config files
+**📂 Project Structure**
+- Backend (complaint_backend/)
+- complaint_backend/
+- ├── prisma/
+- │   ├── migrations/           # DB migrations
+- │   ├── schema.prisma         # Prisma schema
+- │   └── seed.ts               # Hostel seeding
+- ├── src/
+- │   ├── config/               # Config files
 │   │   ├── cloudinary.ts
 │   │   └── multer.ts
 │   ├── middlewares/

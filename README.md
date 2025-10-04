@@ -1,150 +1,223 @@
-# Complaint_project
+ Complaint Management System
 
-# Complaint Management Backend 🚀
+A full-stack web application to manage student complaints across multiple hostels in college.
+Built during Hackathon 2025  using React + Node.js + TypeScript + Prisma + PostgreSQL.
 
-Backend API for the Complaint Management System, built with **Express + TypeScript + Prisma + PostgreSQL**.
-Supports user authentication, complaint submission, **file uploads with Cloudinary**, backend validation with **Zod**, and role-based access for staff/admin.
+⚡ Tech Stack
 
----
+Frontend:
 
-## ⚡ Tech Stack
+React (Vite)
 
-* **Express** (server framework)
-* **TypeScript**
-* **Prisma ORM** (with PostgreSQL / SQLite for dev)
-* **JWT + bcrypt** (authentication)
-* **Zod** (runtime request validation)
-* **Multer + Cloudinary** (file uploads, cloud storage)
-* **CSV Export** (reports)
+TypeScript
 
----
+Axios
 
-## 📂 Project Structure
+Tailwind CSS
 
-```
-complaint-backend/
-  ├── prisma/
-  │   └── schema.prisma      # Database schema
-  ├── src/
-  │   ├── index.ts           # Entry point
-  │   ├── prisma.ts          # Prisma client
-  │   ├── config/
-  │   │   └── cloudinary.ts  # Cloudinary config
-  │   ├── middleware/
-  │   │   └── auth.ts        # JWT middleware
-  │   ├── routes/
-  │   │   ├── auth.ts        # Register & login
-  │   │   └── complaints.ts  # Complaints CRUD
-  ├── .env                   # Environment variables
-  ├── package.json
-  └── tsconfig.json
-```
+Backend:
 
----
+Express (Node.js)
 
-## 🔧 Setup
+TypeScript
 
-### 1. Clone & install
+Prisma ORM (PostgreSQL)
 
-```bash
+JWT + bcrypt (authentication & authorization)
+
+Multer + Cloudinary (file uploads & storage)
+
+Zod (runtime request validation)
+
+json2csv (report export)
+
+📂 Project Structure
+Backend (complaint_backend/)
+complaint_backend/
+├── prisma/
+│   ├── migrations/           # DB migrations
+│   ├── schema.prisma         # Prisma schema
+│   └── seed.ts               # Hostel seeding
+├── src/
+│   ├── config/               # Config files
+│   │   ├── cloudinary.ts
+│   │   └── multer.ts
+│   ├── middlewares/
+│   │   └── auth.ts           # JWT auth middleware
+│   ├── routes/               # Express routes
+│   │   ├── admin.ts
+│   │   ├── auth.ts
+│   │   ├── complaint.ts
+│   │   ├── hostel.ts
+│   │   ├── report.ts
+│   │   └── user.ts
+│   └── index.ts              # App entry point
+├── package.json
+└── tsconfig.json
+
+Frontend (complaint_frontend/)
+complaint_frontend/
+├── public/
+├── src/
+│   ├── api/
+│   │   └── axios.ts          # Axios instance with JWT
+│   ├── components/           # Reusable UI
+│   │   ├── ComplaintActions.tsx
+│   │   ├── ImageModal.tsx
+│   │   ├── ProfileCard.tsx
+│   │   └── StaffRequestCard.tsx
+│   ├── pages/                # Pages (per role)
+│   │   ├── AdminDashboard.tsx
+│   │   ├── AssignedComplaints.tsx
+│   │   ├── ChiefAdminDashboard.tsx
+│   │   ├── Dashboard.tsx     # Citizen
+│   │   ├── Login.tsx
+│   │   ├── NewComplaint.tsx
+│   │   ├── Register.tsx
+│   │   └── StaffDashboard.tsx
+│   ├── types/
+│   │   └── Complaint.ts      # Shared types
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
+├── package.json
+└── tsconfig.json
+
+🔧 Setup Instructions
+Backend
+
+Clone & install dependencies
+
 git clone https://github.com/VINEET-SIKARWAR/Complaint_project.git
-cd complaint-backend
+cd complaint_backend
 npm install
-```
 
-### 2. Configure environment
 
-Create a `.env` file:
+Configure .env
 
-```
-DATABASE_URL="file:./dev.db"   # or your PostgreSQL URL
+DATABASE_URL="postgresql://..."
 JWT_SECRET="supersecret"
-PORT=3000
+ADMIN_CODE="warden-secret"
+CHIEF_ADMIN_CODE="chief-secret"
 
 # Cloudinary
 CLOUDINARY_CLOUD_NAME="your-cloud-name"
 CLOUDINARY_API_KEY="your-api-key"
 CLOUDINARY_API_SECRET="your-api-secret"
-```
 
-### 3. Setup database
 
-```bash
+Run migrations & seed hostels
+
 npx prisma migrate dev --name init
-```
+npm run seed
 
-### 4. Run in development
 
-```bash
+Start server
+
 npm run dev
-```
 
-### 5. Build & run in production
+Frontend
 
-```bash
-npm run build
-npm start
-```
+Open a new terminal
 
----
+cd complaint_frontend
+npm install
+npm run dev
 
-## 🛠 API Endpoints
+👤 Roles & Dashboards
 
-### Auth
+Citizen (Student)
 
-* `POST /api/auth/register` – Register new user (`citizen`, `staff`, `admin`)
-  ✅ Validated with **Zod**
-* `POST /api/auth/login` – Login & get JWT
+Register/login
 
-### Complaints
+File new complaints with photo
 
-* `POST /api/complaints` – Submit complaint (with optional photo uploaded to **Cloudinary**)
-* `GET /api/complaints` – List complaints (citizen = own, staff/admin = all)
-* `PUT /api/complaints/:id` – Update status (`OPEN` → `IN_PROGRESS` → `RESOLVED`, staff/admin only)
+Track their own complaints
 
-### Reports
+Staff
 
-* `GET /api/reports/csv` – Export complaints as CSV (staff/admin only)
+Get complaints assigned by Admin
 
----
+Update complaint status (In Progress / Resolved)
 
-## 📸 File Uploads
+Admin (Warden)
 
-* Uses **Multer** with **Cloudinary storage**.
-* Uploaded images are stored in the cloud and return a secure URL.
-* Accessible directly via `photoUrl` field in complaint object.
+Manage complaints of their own hostel
 
----
+Promote/reject staff requests from their hostel
 
-## 🚀 Deployment
+Assign complaints to staff
 
-* Recommended: **Render / Railway** (free tier for hackathons).
-* PostgreSQL: use managed DB on Railway, Neon, or Supabase.
-* Set environment variables on server:
+Chief Admin
 
-  * `DATABASE_URL`
-  * `JWT_SECRET`
-  * `PORT`
-  * `CLOUDINARY_CLOUD_NAME`
-  * `CLOUDINARY_API_KEY`
-  * `CLOUDINARY_API_SECRET`
+View & filter complaints from all hostels
 
----
+Download reports (CSV)
 
-## ✅ Roadmap / To-Do
+Manage wardens/admins
 
-* [x] User auth (JWT)
-* [x] Complaint CRUD
-* [x] Role-based access
-* [x] Zod validation
-* [x] Cloudinary integration
-* [ ] CSV export
-* [ ] Notifications (email/SMS)
-* [ ] Dashboard analytics
+🛠 API Endpoints
+Auth
 
----
+POST /api/auth/register – Register user (citizen, staff, admin, chief_admin)
 
-## 👨‍💻 Authors
+POST /api/auth/login – Login & get JWT
 
-Built during Hackathon 2025 by **Vineet Sikarwar**.
+Complaints
 
+POST /api/complaints/me – Create complaint
+
+GET /api/complaints – Get complaints (role-based filtering)
+
+PUT /api/complaints/:id/status – Update status
+
+DELETE /api/complaints/:id – Delete complaint
+
+Admin
+
+GET /api/admin/staff-requests – See pending staff requests
+
+PUT /api/admin/promote/:userId – Approve staff request
+
+PUT /api/admin/reject/:userId – Reject staff request
+
+PUT /api/admin/assign/:complaintId – Assign complaint to staff
+
+Hostels
+
+GET /api/hostel – List all hostels
+
+GET /api/hostel/:id/complaints – Get complaints of specific hostel
+
+Reports
+
+GET /api/reports/csv – Export complaints as CSV
+
+📸 Features
+
+File uploads with Cloudinary
+
+Role-based complaint access
+
+Multi-hostel management
+
+Staff request & promotion workflow
+
+Chief Admin CSV report download
+
+Filter complaints by hostel (Chief Admin Dashboard)
+
+✅ Roadmap
+
+Email notifications to staff/admin
+
+Analytics dashboard
+
+Advanced search/filter
+
+Mobile app (React Native)
+
+Authors
+
+Hackathon Project 2025 – Team Void
+Vineet Sikarwar

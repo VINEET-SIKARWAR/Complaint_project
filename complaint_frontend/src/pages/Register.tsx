@@ -13,6 +13,7 @@ const Register: React.FC = () => {
     });
 
     const [message, setMessage] = useState("");
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [hostels, setHostels] = useState<{ id: number; name: string }[]>([]);
     useEffect(() => {
         const fetchHostels = async () => {
@@ -30,21 +31,80 @@ const Register: React.FC = () => {
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: "" });
     };
+
+    //  Frontend validation before submitting
+    const validateForm = (): boolean => {
+        const newErrors: { [key: string]: string } = {};
+
+        // Email validation (for citizen only)
+        if (formData.role === "citizen") {
+            const collegeEmailRegex = /^[\w.-]+@mnnit\.ac\.in$/;
+            if (!collegeEmailRegex.test(formData.email)) {
+                newErrors.email =
+                    "Use your official MNNIT email (e.g., vineet.2025ca111@mnnit.ac.in)";
+            }
+        }
+
+        // Strong password validation
+        const strongPassword =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+        if (!strongPassword.test(formData.password)) {
+            newErrors.password =
+                "Password must have 8+ chars, uppercase, lowercase, number, and special character.";
+        }
+
+        // Hostel required for staff/admin
+        if (
+            (formData.role === "staff" || formData.role === "admin") &&
+            !formData.hostelId
+        ) {
+            newErrors.hostelId = "Hostel is required for this role.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; //return boolean
+    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setMessage("");
+
+        if (!validateForm()) return; // stop if frontend validation fails
         try {
             const payload = {
                 ...formData,
                 hostelId: formData.hostelId ? Number(formData.hostelId) : undefined,
             };
-            const res = await API.post("/auth/register", formData);
+            const res = await API.post("/auth/register", payload);
             setMessage(res.data.message);
+            setFormData({
+                name: "",
+                email: "",
+                password: "",
+                role: "citizen",
+                adminCode: "",
+                chiefAdminCode: "",
+                hostelId: "",
+            });
+            setErrors({});
         } catch (err: any) {
-            setMessage(err.response?.data?.error || "Something went wrong");
-        }
-    };
+            // Handle backend Zod validation errors
+            if (err.response?.data?.errors) {
+                const backendErrors = err.response.data.errors;
+                const newErrors: { [key: string]: string } = {};
+                for (const key in backendErrors) {
+                    newErrors[key] = backendErrors[key][0];
+                }
+                setErrors(newErrors);
+            } else {
+                setMessage(err.response?.data?.error || "Something went wrong");
+            }
+
+        };
+    }
 
 
 
@@ -106,6 +166,9 @@ const Register: React.FC = () => {
                         className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         required
                     />
+                    {errors.password && (
+                        <p className="text-red-500 text-xs">{errors.password}</p>
+                    )}
                 </div>
 
                 {/* Role */}

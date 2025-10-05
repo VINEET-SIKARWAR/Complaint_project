@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest, authenticate } from "../middlewares/auth";
+import sendEmail from "../config/mailer";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -159,8 +160,21 @@ router.put("/assign/:complaintId", authenticate, async (req: AuthRequest, res: R
       include: {
         reporter: { select: { name: true, email: true } },
         assignedTo: { select: { name: true, email: true } },
+        hostel: { select: { name: true } }
       },
     });
+    await sendEmail(
+      updatedComplaint.reporter.email,
+      "Your Complaint Has Been Assigned",
+      `Hello ${updatedComplaint.reporter.name},\n\n` +
+      `Your complaint "${updatedComplaint.title}" for hostel "${updatedComplaint.hostel?.name ?? "N/A"}" has been assigned to the staff member:\n\n` +
+      `Name: ${updatedComplaint.assignedTo?.name}\n` +
+      `Email: ${updatedComplaint.assignedTo?.email}\n\n` +
+      `The status of your complaint is now "${updatedComplaint.status}".\n\n` +
+      `We will keep you updated on any further progress.\n\n` +
+      `Thank you,\nComplaint Management Team`
+    );
+
 
     res.json({ message: "Complaint assigned successfully", complaint: updatedComplaint });
   } catch (err) {

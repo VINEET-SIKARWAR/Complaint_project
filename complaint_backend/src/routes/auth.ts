@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import sendEmail from "../config/mailer";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
@@ -140,6 +141,14 @@ router.post("/register", async (req: Request, res: Response) => {
         staffRequest,
       },
     });
+    // Send email with credentials
+    await sendEmail(
+      user.email,
+      "Welcome to Complaint System",
+      `Hello ${user.name},\n\n` +
+      `Your account has been created successfully.\n` +
+      `Email: ${user.email}\nPassword: ${password}\n\nPlease login to your account.`
+    );
 
     res.status(201).json({
       message: "User registered successfully",

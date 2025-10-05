@@ -2,6 +2,7 @@ import express from "express";
 import { Response } from "express";
 import upload from "../config/multer";
 import { z } from "zod";
+import sendEmail from "../config/mailer";
 
 import { authenticate, AuthRequest } from "../middlewares/auth";
 import { PrismaClient } from "@prisma/client";
@@ -50,6 +51,25 @@ router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest
 
       }
     });
+
+    await sendEmail(
+      complaint.reporter.email,
+      "Complaint Registered Successfully",
+      `Hello ${complaint.reporter.name},\n\n` +
+      `We have successfully received your complaint:\n\n` +
+      `Title       : ${complaint.title}\n` +
+      `Hostel      : ${complaint.hostel?.name ?? "N/A"}\n` +
+      `Category    : ${complaint.category}\n` +
+      `Description : ${complaint.description}\n` +
+      `Current Status : ${complaint.status}\n\n` +
+      `Our team will review your complaint and take appropriate action. ` +
+      `You will be notified via email whenever there is a status update.\n\n` +
+      `Thank you for helping us maintain a better environment!\n\n` +
+      `- Complaint Management Team`
+    );
+
+
+
 
 
     res.status(201).json({ message: "Complaint created", complaint });
@@ -163,8 +183,23 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
       include: {
         reporter: { select: { name: true, email: true } },
         assignedTo: { select: { name: true, email: true } },
+         hostel: { select: { name: true } }, 
       },
     });
+
+    await sendEmail(
+      updatedComplaint.reporter.email,
+      "Update on Your Complaint",
+      `Hello ${updatedComplaint.reporter.name},\n\n` +
+      `We wanted to inform you that the status of your complaint has been updated:\n\n` +
+      `Title       : ${updatedComplaint.title}\n` +
+      `Hostel      : ${updatedComplaint.hostel?.name ?? "N/A"}\n` +
+      `Category    : ${updatedComplaint.category ?? "N/A"}\n` +
+      `New Status  : ${updatedComplaint.status}\n\n` +
+      `Thank you for your patience. Complain is resolved.\n\n` +
+      `- Complaint Management Team`
+    );
+
 
     res.json({ message: "Status updated successfully", complaint: updatedComplaint });
   } catch (error) {

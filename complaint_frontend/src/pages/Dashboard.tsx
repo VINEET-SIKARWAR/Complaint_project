@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <div>
         <ProfileCard
           name={name || "Citizen"}
@@ -85,7 +85,7 @@ const Dashboard: React.FC = () => {
 
       {/* Complaints Table */}
       <div className="bg-white shadow rounded-lg overflow-x-auto">
-        <table className="w-full text-sm text-left text-gray-600">
+        <table className="w-full text-sm text-left text-gray-600 min-w-[700px] md:min-w-full">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
               <th className="px-4 py-2">Title</th>
@@ -118,7 +118,7 @@ const Dashboard: React.FC = () => {
                     {c.status}
                   </span>
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-2 md:px-4 py-2 text-xs md:text-sm">
                   {c.reporter?.name} <br />
                   <span className="text-xs text-gray-500">
                     {c.reporter?.email}

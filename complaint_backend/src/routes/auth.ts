@@ -14,7 +14,7 @@ const registerSchema = z
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    role: z.enum(["citizen", "staff", "admin","chief_admin"]).default("citizen"),
+    role: z.enum(["citizen", "staff", "admin", "chief_admin"]).default("citizen"),
     adminCode: z.string().optional(),
     chiefAdminCode: z.string().optional(),
     hostelId: z.string().optional(), // required for staff/admin
@@ -48,7 +48,17 @@ router.post("/register", async (req: Request, res: Response) => {
         .json({ errors: parsed.error.flatten().fieldErrors });
     }
 
-    const { email, password, name, role, adminCode, hostelId,chiefAdminCode} = parsed.data;
+    const { email, password, name, role, adminCode, hostelId, chiefAdminCode } = parsed.data;
+
+
+    // College email restriction for citizens only
+    const mnnitEmailPattern = /^[\w.-]+@mnnit\.ac\.in$/;
+    if (role === "citizen" && !mnnitEmailPattern.test(email)) {
+      return res.status(400).json({
+        error:
+          "Only MNNIT college email IDs are allowed for students (citizens).",
+      });
+    }
 
     //  check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -60,7 +70,7 @@ router.post("/register", async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Default values
-    let finalRole: "citizen" | "staff" | "admin"|"chief_admin" = "citizen";
+    let finalRole: "citizen" | "staff" | "admin" | "chief_admin" = "citizen";
     let staffRequest = false;
     let finalHostelId: number | null = null;
 
@@ -73,6 +83,16 @@ router.post("/register", async (req: Request, res: Response) => {
       }
 
       if (adminCode && adminCode === process.env.ADMIN_CODE) {
+        // Limit admin count to 3 per hostel
+        const adminCount = await prisma.user.count({
+          where: { role: "admin", hostelId: Number(hostelId) },
+        });
+
+        if (adminCount >= 3) {
+          return res
+            .status(400)
+            .json({ error: "This hostel already has 3 admins assigned." });
+        }
         finalRole = "admin";
         finalHostelId = Number(hostelId);
       } else {
@@ -174,7 +194,7 @@ router.post("/login", async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        hostelId:user.hostelId,
+        hostelId: user.hostelId,
       },
     });
 

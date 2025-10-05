@@ -207,7 +207,7 @@ Chief Admin CSV report download
 
 Filter complaints by hostel (Chief Admin Dashboard)
 
-✅ Roadmap
+Roadmap
 
 Email notifications to staff/admin
 

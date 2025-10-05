@@ -208,9 +208,9 @@ Chief Admin CSV report download
 
 Filter complaints by hostel (Chief Admin Dashboard)
 
-Roadmap
+Email notification send to the citizen on status update
 
-Email notifications to staff/admin
+Roadmap
 
 Analytics dashboard
 

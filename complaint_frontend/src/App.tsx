@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import PublicPortal from "./pages/PublicPortal";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -9,10 +10,12 @@ import AssignedComplaints from "./pages/AssignedComplaints";
 import NewComplaint from "./pages/NewComplaint";
 import ChiefAdminDashboard from "./pages/ChiefAdminDashboard";
 
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/publicportal" element={<PublicPortal/>}/>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />

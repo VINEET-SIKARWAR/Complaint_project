@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 import API from "../api/axios";
 import { Link } from "react-router-dom";
 const Register: React.FC = () => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        name: string;
+        email: string;
+        password: string;
+        role: "citizen" | "staff" | "admin" | "chief_admin";
+        adminCode: string;
+        chiefAdminCode: string;
+        hostelId: number | "";
+    }>({
         name: "",
         email: "",
         password: "",
@@ -77,7 +85,11 @@ const Register: React.FC = () => {
             const payload = {
                 ...formData,
                 hostelId: formData.hostelId ? Number(formData.hostelId) : undefined,
+                adminCode: formData.adminCode || undefined,
+                chiefAdminCode: formData.chiefAdminCode || undefined,
             };
+            console.log("Payload being sent to backend:", payload);
+
             const res = await API.post("/auth/register", payload);
             setMessage(res.data.message);
             setFormData({
@@ -209,7 +221,9 @@ const Register: React.FC = () => {
                             <select
                                 name="hostelId"
                                 value={formData.hostelId}
-                                onChange={handleChange}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, hostelId: Number(e.target.value) })
+                                }
                                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 required
                             >
@@ -230,7 +244,9 @@ const Register: React.FC = () => {
                         <select
                             name="hostelId"
                             value={formData.hostelId}
-                            onChange={handleChange}
+                            onChange={(e) =>
+                                setFormData({ ...formData, hostelId: Number(e.target.value) })
+                            }
                             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             required
                         >

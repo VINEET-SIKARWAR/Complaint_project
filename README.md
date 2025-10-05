@@ -41,6 +41,7 @@ json2csv (report export)
 - ├── src/
 - │   ├── config/               # Config files
 - │   │   ├── cloudinary.ts
+- |   |   ├── mailer.ts
 - │   │   └── multer.ts
 - │    ├── middlewares/
 - │   │   └── auth.ts           # JWT auth middleware

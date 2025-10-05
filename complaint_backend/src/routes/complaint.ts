@@ -173,17 +173,24 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
         return res.status(400).json({ error: "Staff can only set status to IN_PROGRESS or RESOLVED" });
       }
     }
+    const dataToUpdate: any = { status };
+
+    if (status === "RESOLVED") {
+      dataToUpdate.resolvedAt = new Date();
+    } else {
+      dataToUpdate.resolvedAt = null; // optional, clears previous timestamp if reopened
+    }
 
     // ADMIN rules → can change to anything
     // (no extra check needed, since citizen already blocked above)
 
     const updatedComplaint = await prisma.complaint.update({
       where: { id: complaintId },
-      data: { status },
+      data: dataToUpdate ,
       include: {
         reporter: { select: { name: true, email: true } },
         assignedTo: { select: { name: true, email: true } },
-         hostel: { select: { name: true } }, 
+        hostel: { select: { name: true } },
       },
     });
 

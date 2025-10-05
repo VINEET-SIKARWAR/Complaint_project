@@ -24,7 +24,7 @@ const registerSchema = z
     role: z.enum(["citizen", "staff", "admin", "chief_admin"]).default("citizen"),
     adminCode: z.string().optional(),
     chiefAdminCode: z.string().optional(),
-    hostelId: z.string().optional(), // required for staff/admin
+    hostelId: z.union([z.string(), z.number()]).optional() // required for staff/admin
   })
   .refine(
     (data) => {

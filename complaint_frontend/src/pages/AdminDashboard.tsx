@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import API from "../api/axios";
 import ImageModal from "../components/ImageModal";
 import { BellIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import ProfileCard from "../components/ProfileCard";
 import { Complaint } from "../types/Complaint";
+import ComplaintHeatmap from "../components/ComplaintHeatmap";
 
 interface Staff {
   id: number;
@@ -26,30 +27,37 @@ const AdminDashboard: React.FC = () => {
   const name = localStorage.getItem("name") || "Admin";
   const email = localStorage.getItem("email") || "No email";
   const profileUrl = localStorage.getItem("profileUrl") || "";
+  const role=localStorage.getItem("role") as "admin"||"chief_admin"
   const navigate = useNavigate();
 
   // Fetch complaints + staff
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [complaintsRes, staffRes, requestRes] = await Promise.all([
-          API.get("/complaints"),
-          API.get("/users/staff"),
-          API.get("/admin/staff-requests"),
-        ]);
-        setComplaints(complaintsRes.data);
-        setStaffList(staffRes.data);
-        setPendingRequests(requestRes.data.length);
-      } catch (err: any) {
-        setError(err.response?.data?.error || "Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = useCallback(async () => {
 
-    fetchData();
+    try {
+      const [complaintsRes, staffRes, requestRes] = await Promise.all([
+        API.get("/complaints"),
+        API.get("/users/staff"),
+        API.get("/admin/staff-requests"),
+      ]);
+      setComplaints(complaintsRes.data);
+      setStaffList(staffRes.data);
+      setPendingRequests(requestRes.data.length);
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Failed to load data");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  //only run one time
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const refreshData = async () => {
+    setLoading(true);
+    await fetchData();
+  };
   // Assign staff
   const assignComplaint = async (complaintId: number, staffId: string) => {
     if (!staffId) return alert("Please select a staff member");
@@ -57,6 +65,7 @@ const AdminDashboard: React.FC = () => {
     try {
       await API.put(`/admin/assign/${complaintId}`, { staffId });
       alert("Complaint assigned successfully");
+      fetchData();
       const res = await API.get("/complaints");
       setComplaints(res.data);
     } catch (err) {
@@ -114,6 +123,21 @@ const AdminDashboard: React.FC = () => {
           )}
         </button>
       </ProfileCard>
+
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Complaint Overview</h2>
+        <button
+          onClick={refreshData}
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Refresh
+        </button>
+      </div>
+
+      <div className="mt-4">
+        {/* CHANGED: Ensure heatmap doesn’t refetch infinitely (controlled inside component) */}
+        <ComplaintHeatmap role={role} />
+      </div>
 
       {/* CSV Export Button */}
       <div className="flex justify-end mb-4">

@@ -1,8 +1,9 @@
 // src/pages/ChiefAdminDashboard.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
 import API from "../api/axios";
 import ProfileCard from "../components/ProfileCard";
 import { Complaint } from "../types/Complaint";
+import ComplaintHeatmap from "../components/ComplaintHeatmap";
 
 interface Hostel {
     id: number;
@@ -18,32 +19,38 @@ const ChiefAdminDashboard: React.FC = () => {
 
     const name = localStorage.getItem("name") || "Chief Admin";
     const email = localStorage.getItem("email") || "No email";
-    const role =
-        (localStorage.getItem("role") as "citizen" | "staff" | "admin" | "chief_admin") || "citizen";
+    const role = localStorage.getItem("role") as "admin" || "chief_admin"
 
 
     useEffect(() => {
+        let isMounted = true;
         const fetchData = async () => {
             try {
                 const [complaintsRes, hostelsRes] = await Promise.all([
                     API.get("/complaints"),   // chief_admin sees ALL
                     API.get("/hostel"),      // for filter dropdown
                 ]);
+                if (!isMounted) return;
                 setComplaints(complaintsRes.data);
                 setHostels(hostelsRes.data);
             } catch (err: any) {
-                setError(err.response?.data?.error || "Failed to load data");
+                if (isMounted)
+                    setError(err.response?.data?.error || "Failed to load data");
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
         fetchData();
+        return () => {
+            isMounted = false; // cleanup to stop multiple fetch loops
+        };
     }, []);
 
-  const filteredComplaints = selectedHostel
-  ? complaints.filter(c => String(c.hostel?.id) === selectedHostel)
-  : complaints;
-
+    const filteredComplaints = useMemo(() => {
+    return selectedHostel
+      ? complaints.filter((c) => String(c.hostel?.id) === selectedHostel)
+      : complaints;
+  }, [complaints, selectedHostel]);
 
 
     const downloadCSV = async () => {
@@ -74,6 +81,10 @@ const ChiefAdminDashboard: React.FC = () => {
         <div className="p-6 space-y-6">
             {/* Profile */}
             <ProfileCard name={name} email={email} role={role} />
+            <div className="mt-4">
+
+                <ComplaintHeatmap role={role} />
+            </div>
 
             {/* Filters */}
             <div className="flex space-x-4 mb-4">

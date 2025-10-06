@@ -11,7 +11,7 @@
     "prisma:migrate": "prisma migrate dev",
     "seed": "ts-node prisma/seed.ts"
   },
-   "prisma": {
+  "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],

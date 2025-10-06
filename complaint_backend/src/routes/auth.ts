@@ -178,10 +178,11 @@ router.post("/login", async (req: Request, res: Response) => {
     }
     const { email, password } = parsed.data;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email }, include: { hostel: true }, });
     if (!user) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
+    const hostelName = user.hostel ? user.hostel.name : null;
 
     // compare password
     const isMatch = await bcrypt.compare(password, user.password);
@@ -210,6 +211,7 @@ router.post("/login", async (req: Request, res: Response) => {
         email: user.email,
         role: user.role,
         hostelId: user.hostelId,
+        hostelName,
       },
     });
 

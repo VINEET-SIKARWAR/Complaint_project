@@ -126,9 +126,9 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Complaints Table */}
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-white shadow rounded-lg p-6 overflow-x-auto">
         <h3 className="text-lg font-semibold mb-4">All Complaints</h3>
-        <table className="w-full text-sm text-left text-gray-600">
+        <table className="w-full min-w-[800px] text-sm text-left text-gray-600">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
               <th className="px-4 py-2">Title</th>
@@ -145,11 +145,11 @@ const AdminDashboard: React.FC = () => {
           <tbody>
             {complaints.map((c) => (
               <tr key={c.id} className="border-t">
-                <td className="px-4 py-2">{c.title}</td>
-                <td className="px-4 py-2">{c.category}</td>
-                <td className="px-4 py-2">{c.area}</td>
-                <td className="px-4 py-2">{c.hostel?.name || "N/A"}</td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 sm:px-4">{c.title}</td>
+                <td className="px-4 py-2 sm:px-4">{c.category}</td>
+                <td className="px-4 py-2 sm:px-4">{c.area}</td>
+                <td className="px-4 py-2 sm:px-4">{c.hostel?.name || "N/A"}</td>
+                <td className="px-4 py-2 sm:px-4">
                   <span
                     className={`px-2 py-1 rounded text-xs ${c.status === "OPEN"
                       ? "bg-yellow-100 text-yellow-800"
@@ -182,7 +182,7 @@ const AdminDashboard: React.FC = () => {
                 <td className="px-4 py-2">
                   {/* Assign Staff Dropdown */}
                   {c.status === "OPEN" ? (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                       <select
                         onChange={(e) =>
                           setSelectedStaff({
@@ -191,7 +191,7 @@ const AdminDashboard: React.FC = () => {
                           })
                         }
                         value={selectedStaff[c.id] || ""}
-                        className="border rounded px-2 py-1"
+                        className="border rounded px-2 py-1 text-xs sm:text-sm"
                       >
                         <option value="">Assign Staff</option>
                         {staffList.map((s) => (
@@ -204,13 +204,13 @@ const AdminDashboard: React.FC = () => {
                         onClick={() =>
                           assignComplaint(c.id, selectedStaff[c.id])
                         }
-                        className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600"
+                        className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 text-xs sm:text-sm"
                       >
                         Assign
                       </button>
                     </div>
                   ) : (
-                    <span className="px-3 py-1 rounded bg-gray-200 text-gray-600 font-semibold">
+                    <span className="px-3 py-1 rounded bg-gray-200 text-gray-600 font-semibold text-xs sm:text-sm">
                       Assigned {c.assignedTo?.name && `to ${c.assignedTo.name}`}
                     </span>
                   )}
@@ -218,7 +218,7 @@ const AdminDashboard: React.FC = () => {
                 <td className="px-4 py-2">
                   <button
                     onClick={() => deleteComplaint(c.id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs sm:text-sm"
                   >
                     Delete
                   </button>

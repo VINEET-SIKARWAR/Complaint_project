@@ -64,6 +64,7 @@ complaint_frontend/
 - │   │   └── axios.ts          # Axios instance with JWT
 - │   ├── components/           # Reusable UI
 - │   │   ├── ComplaintActions.tsx
+- |   |   ├── ComplaintHeatmap.tsx
 - │   │   ├── ImageModal.tsx
 - │   │   ├── ProfileCard.tsx
 - │   │   └── StaffRequestCard.tsx
@@ -209,6 +210,8 @@ Chief Admin CSV report download
 Filter complaints by hostel (Chief Admin Dashboard)
 
 Email notification send to the citizen on status update
+
+Heatmap Visualization-Admin and chief_admin can view the heatmap of complaints.
 
 Roadmap
 

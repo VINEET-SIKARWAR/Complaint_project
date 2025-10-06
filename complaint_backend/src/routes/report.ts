@@ -25,7 +25,7 @@ router.get("/csv", authenticate, async (req: AuthRequest, res: Response) => {
       complaints = await prisma.complaint.findMany({
         where: { hostelId: req.user!.hostelId },
 
-         include: { reporter: true, hostel: true },
+        include: { reporter: true, hostel: true },
       });
     } else if (req.user!.role === "chief_admin") {
       // Chief admin sees all
@@ -59,5 +59,31 @@ router.get("/csv", authenticate, async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
+// GET /api/reports/heatmap
+router.get("/heatmap", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "admin" && req.user?.role !== "chief_admin") {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    let filter = {};
+    if (req.user.role === "admin") {
+      filter = { hostelId: req.user.hostelId }; // admin → only own hostel
+    }
+
+    const heatmapData = await prisma.complaint.groupBy({
+      by: ["area"],
+      where: filter,
+      _count: { _all: true },
+    });
+
+    res.json(heatmapData);
+  } catch (err) {
+    console.error("Error fetching heatmap data:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
 
 export default router;

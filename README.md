@@ -1,7 +1,8 @@
- Complaint Management System
+Complaint Management System
 
-A full-stack web application to manage student complaints across multiple hostels in college.
-Built during Hackathon 2025  using React + Node.js + TypeScript + Prisma + PostgreSQL.
+A full-stack web application to manage student complaints across multiple hostels in college. Built during Hackathon 2025 using React, Node.js, TypeScript, Prisma, and PostgreSQL.
+
+This system allows students to file complaints, track their status, and enables staff and admins to manage, assign, and resolve complaints efficiently.
 
 ⚡ Tech Stack
 
@@ -127,14 +128,15 @@ npm install
 npm run dev
 
 👤 Roles & Dashboards
+👤 Roles & Dashboards
 
 Citizen (Student)
 
-Register/login
+Register/Login
 
 File new complaints with photo
 
-Track their own complaints
+Track own complaints
 
 Staff
 
@@ -144,9 +146,9 @@ Update complaint status (In Progress / Resolved)
 
 Admin (Warden)
 
-Manage complaints of their own hostel
+Manage complaints of their hostel
 
-Promote/reject staff requests from their hostel
+Promote/reject staff requests
 
 Assign complaints to staff
 
@@ -154,9 +156,9 @@ Chief Admin
 
 View & filter complaints from all hostels
 
-Download reports (CSV)
+Download CSV reports
 
-Manage wardens/admins
+Manage admins/wardens
 
 🛠 API Endpoints
 Auth
@@ -194,6 +196,8 @@ GET /api/hostel/:id/complaints – Get complaints of specific hostel
 Reports
 
 GET /api/reports/csv – Export complaints as CSV
+GET /api/reports/heatmap-export heatmap data
+GET /api/reports/sla-export SLA data
 
 📸 Features
 
@@ -212,6 +216,8 @@ Filter complaints by hostel (Chief Admin Dashboard)
 Email notification send to the citizen on status update
 
 Heatmap Visualization-Admin and chief_admin can view the heatmap of complaints.
+
+SLA Tracking of complaints
 
 Roadmap
 

@@ -13,7 +13,7 @@ interface ComplaintHeatmapProps {
   role?: "admin" | "chief_admin";
 }
 
-const ComplaintHeatmap: React.FC<ComplaintHeatmapProps> = ({ role = "admin" }) => {
+const ComplaintHeatmap: React.FC<ComplaintHeatmapProps> = React.memo(({ role = "admin" }) => {
   const [data, setData] = useState<{ name: string; size: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -40,7 +40,7 @@ const ComplaintHeatmap: React.FC<ComplaintHeatmapProps> = ({ role = "admin" }) =
     };
 
     fetchData();
-  }, [role]);
+  }, []);
 
   if (loading)
     return <p className="text-center text-gray-500 mt-4">Loading heatmap...</p>;
@@ -77,7 +77,8 @@ const ComplaintHeatmap: React.FC<ComplaintHeatmapProps> = ({ role = "admin" }) =
       )}
     </div>
   );
-};
+}
+)
 
 const CustomizedContent = (props: any) => {
   const { depth, x, y, width, height, name, size } = props;

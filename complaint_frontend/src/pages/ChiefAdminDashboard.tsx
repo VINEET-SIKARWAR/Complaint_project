@@ -1,5 +1,5 @@
 // src/pages/ChiefAdminDashboard.tsx
-import React, { useEffect, useState,useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import API from "../api/axios";
 import ProfileCard from "../components/ProfileCard";
 import { Complaint } from "../types/Complaint";
@@ -17,6 +17,10 @@ const ChiefAdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    const [avgResolutionTime, setAvgResolutionTime] = useState<number>(0);
+    const [slaBreachRate, setSlaBreachRate] = useState<number>(0);
+
+
     const name = localStorage.getItem("name") || "Chief Admin";
     const email = localStorage.getItem("email") || "No email";
     const role = localStorage.getItem("role") as "admin" || "chief_admin"
@@ -26,13 +30,20 @@ const ChiefAdminDashboard: React.FC = () => {
         let isMounted = true;
         const fetchData = async () => {
             try {
-                const [complaintsRes, hostelsRes] = await Promise.all([
+                const [complaintsRes, hostelsRes, slaStatsRes] = await Promise.all([
                     API.get("/complaints"),   // chief_admin sees ALL
                     API.get("/hostel"),      // for filter dropdown
+                    API.get("/reports/sla"), //backend endpoint for sla summary
                 ]);
                 if (!isMounted) return;
                 setComplaints(complaintsRes.data);
                 setHostels(hostelsRes.data);
+                const data = slaStatsRes.data;
+                const breachRate =
+                    data.total > 0 ? (data.breached / data.total) * 100 : 0;
+
+                setAvgResolutionTime(Number(data.avgResolution)); // backend sends avgResolution
+                setSlaBreachRate(Number(breachRate)); // derived percentage
             } catch (err: any) {
                 if (isMounted)
                     setError(err.response?.data?.error || "Failed to load data");
@@ -47,10 +58,10 @@ const ChiefAdminDashboard: React.FC = () => {
     }, []);
 
     const filteredComplaints = useMemo(() => {
-    return selectedHostel
-      ? complaints.filter((c) => String(c.hostel?.id) === selectedHostel)
-      : complaints;
-  }, [complaints, selectedHostel]);
+        return selectedHostel
+            ? complaints.filter((c) => String(c.hostel?.id) === selectedHostel)
+            : complaints;
+    }, [complaints, selectedHostel]);
 
 
     const downloadCSV = async () => {
@@ -81,9 +92,28 @@ const ChiefAdminDashboard: React.FC = () => {
         <div className="p-6 space-y-6">
             {/* Profile */}
             <ProfileCard name={name} email={email} role={role} />
+
+
             <div className="mt-4">
 
                 <ComplaintHeatmap role={role} />
+               
+            </div>
+             {/*SLA */}
+             <div className="grid md:grid-cols-1 gap-6 mt-4">
+                <div className="bg-white shadow rounded-lg p-6">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                        SLA Performance Overview
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                        <strong>Average Resolution Time:</strong>{" "}
+                        {avgResolutionTime ? avgResolutionTime.toFixed(2) : "0.00"} hours
+                    </p>
+                    <p className="text-sm text-gray-600 mt-2">
+                        <strong>SLA Breach Rate:</strong>{" "}
+                        {slaBreachRate ? slaBreachRate.toFixed(1) : "0"}%
+                    </p>
+                </div>
             </div>
 
             {/* Filters */}
@@ -108,6 +138,7 @@ const ChiefAdminDashboard: React.FC = () => {
                     Download CSV
                 </button>
             </div>
+            
 
             {/* Complaints Table */}
             <div className="bg-white shadow rounded-lg overflow-x-auto">

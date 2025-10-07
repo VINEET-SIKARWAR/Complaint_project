@@ -68,4 +68,6 @@ model Complaint {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   resolvedAt DateTime?
+  slaHours    Int        @default(48)
+  breached    Boolean    @default(false) 
 }

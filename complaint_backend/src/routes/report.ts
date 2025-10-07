@@ -85,5 +85,52 @@ router.get("/heatmap", authenticate, async (req: AuthRequest, res: Response) => 
   }
 });
 
+router.get("/sla", authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user?.role !== "admin" && req.user?.role !== "chief_admin") {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const filter =
+      req.user.role === "admin"
+        ? { hostelId: req.user.hostelId }
+        : {};
+
+    const [total, resolved, breached] = await Promise.all([
+      prisma.complaint.count({ where: filter }),
+      prisma.complaint.count({ where: { ...filter, status: "RESOLVED" } }),
+      prisma.complaint.count({ where: { ...filter, breached: true } }),
+    ]);
+
+    const avgTimeData = await prisma.complaint.findMany({
+      where: { ...filter, status: "RESOLVED" },
+      select: { createdAt: true, resolvedAt: true },
+    });
+
+    const avgResolution =
+      avgTimeData.length > 0
+        ? avgTimeData.reduce((sum, c) => {
+            const hrs =
+              (new Date(c.resolvedAt!).getTime() -
+                new Date(c.createdAt).getTime()) /
+              (1000 * 60 * 60);
+            return sum + hrs;
+          }, 0) / avgTimeData.length
+        : 0;
+
+    res.json({
+      total,
+      resolved,
+      breached,
+      resolvedWithinSLA: resolved - breached,
+      avgResolution: avgResolution.toFixed(2),
+    });
+  } catch (err) {
+    console.error("Error fetching SLA stats:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
 
 export default router;

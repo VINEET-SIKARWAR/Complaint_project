@@ -176,9 +176,21 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
     const dataToUpdate: any = { status };
 
     if (status === "RESOLVED") {
-      dataToUpdate.resolvedAt = new Date();
+
+      const resolvedAt = new Date();
+      const createdAt = complaint.createdAt;
+      const diffHours = (resolvedAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+
+      const slaHours = complaint.slaHours ?? 48;
+      const breached = diffHours > slaHours;
+
+
+      dataToUpdate.resolvedAt = resolvedAt;
+      dataToUpdate.breached = breached;
+
     } else {
       dataToUpdate.resolvedAt = null; // optional, clears previous timestamp if reopened
+      dataToUpdate.breached = false;
     }
 
     // ADMIN rules → can change to anything
@@ -186,7 +198,7 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
 
     const updatedComplaint = await prisma.complaint.update({
       where: { id: complaintId },
-      data: dataToUpdate ,
+      data: dataToUpdate,
       include: {
         reporter: { select: { name: true, email: true } },
         assignedTo: { select: { name: true, email: true } },

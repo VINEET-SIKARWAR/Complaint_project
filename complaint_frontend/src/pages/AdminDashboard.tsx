@@ -23,11 +23,12 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [pendingRequests, setPendingRequests] = useState<number>(0);
+  const [slaStats, setSlaStats] = useState<any>(null);
 
   const name = localStorage.getItem("name") || "Admin";
   const email = localStorage.getItem("email") || "No email";
   const profileUrl = localStorage.getItem("profileUrl") || "";
-  const role=localStorage.getItem("role") as "admin"||"chief_admin"
+  const role = localStorage.getItem("role") as "admin" || "chief_admin"
   const navigate = useNavigate();
 
   // Fetch complaints + staff
@@ -53,6 +54,18 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await API.get("/reports/sla");
+        setSlaStats(res.data);
+      } catch (err) {
+        console.error("Failed to fetch SLA stats", err);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const refreshData = async () => {
     setLoading(true);
@@ -148,6 +161,30 @@ const AdminDashboard: React.FC = () => {
           Download CSV Report
         </button>
       </div>
+      {slaStats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-green-100 p-4 rounded-lg text-center shadow">
+            <p className="text-sm text-gray-600">Resolved Within SLA</p>
+            <p className="text-lg font-bold text-green-700">
+              {slaStats.resolvedWithinSLA}
+            </p>
+          </div>
+          <div className="bg-yellow-100 p-4 rounded-lg text-center shadow">
+            <p className="text-sm text-gray-600">Breached SLA</p>
+            <p className="text-lg font-bold text-yellow-700">{slaStats.breached}</p>
+          </div>
+          <div className="bg-blue-100 p-4 rounded-lg text-center shadow">
+            <p className="text-sm text-gray-600">Average Resolution (hrs)</p>
+            <p className="text-lg font-bold text-blue-700">
+              {slaStats.avgResolution}
+            </p>
+          </div>
+          <div className="bg-gray-100 p-4 rounded-lg text-center shadow">
+            <p className="text-sm text-gray-600">Total Complaints</p>
+            <p className="text-lg font-bold text-gray-700">{slaStats.total}</p>
+          </div>
+        </div>
+      )}
 
       {/* Complaints Table */}
       <div className="bg-white shadow rounded-lg p-6 overflow-x-auto">

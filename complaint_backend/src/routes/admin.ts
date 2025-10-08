@@ -156,7 +156,7 @@ router.put("/assign/:complaintId", authenticate, async (req: AuthRequest, res: R
 
     const updatedComplaint = await prisma.complaint.update({
       where: { id: Number(complaintId) },
-      data: { assignedToId: staff.id, status: "IN_PROGRESS" },
+      data: { assignedToId: staff.id, status: "IN_PROGRESS" ,},
       include: {
         reporter: { select: { name: true, email: true } },
         assignedTo: { select: { name: true, email: true } },

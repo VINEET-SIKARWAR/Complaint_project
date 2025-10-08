@@ -32,11 +32,13 @@ model User {
   // If this user is an Admin/Warden/staff, link them to a Hostel
   hostelId Int?
   hostel   Hostel? @relation(fields: [hostelId], references: [id])
+
+  escalatedComplaints Complaint[] @relation("Escalator")
 }
 
 model Hostel {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
   block String? // optional: block number/name
 
   // Relations
@@ -65,9 +67,11 @@ model Complaint {
   hostelId Int?
   hostel   Hostel? @relation(fields: [hostelId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  resolvedAt DateTime?
-  slaHours    Int        @default(48)
-  breached    Boolean    @default(false) 
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  resolvedAt    DateTime?
+  slaHours      Int       @default(48)
+  breached      Boolean   @default(false)
+  escalatedById Int?
+  escalatedBy   User?     @relation("Escalator", fields: [escalatedById], references: [id])
 }

@@ -156,11 +156,15 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
     // find complaint
     const complaint = await prisma.complaint.findUnique({
       where: { id: complaintId },
+      include: { assignedTo: true, reporter: true, hostel: true },
+
     });
 
     if (!complaint) {
       return res.status(404).json({ error: "Complaint not found" });
     }
+
+
 
     // STAFF rules
     if (req.user?.role === "staff") {
@@ -188,9 +192,16 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
       dataToUpdate.resolvedAt = resolvedAt;
       dataToUpdate.breached = breached;
 
+      if (breached) {
+        dataToUpdate.escalated = true;
+        dataToUpdate.assignedToId = null; // remove old staff
+        dataToUpdate.status = "ESCALATED"; // mark status
+        dataToUpdate.escalatedById = req.user!.userId; // record who escalated it
+      }
     } else {
       dataToUpdate.resolvedAt = null; // optional, clears previous timestamp if reopened
       dataToUpdate.breached = false;
+      dataToUpdate.escalated = false;
     }
 
     // ADMIN rules → can change to anything
@@ -206,21 +217,21 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
       },
     });
 
-    await sendEmail(
-      updatedComplaint.reporter.email,
-      "Update on Your Complaint",
-      `Hello ${updatedComplaint.reporter.name},\n\n` +
-      `We wanted to inform you that the status of your complaint has been updated:\n\n` +
-      `Title       : ${updatedComplaint.title}\n` +
-      `Hostel      : ${updatedComplaint.hostel?.name ?? "N/A"}\n` +
-      `Category    : ${updatedComplaint.category ?? "N/A"}\n` +
-      `New Status  : ${updatedComplaint.status}\n\n` +
-      `Thank you for your patience. Complain is resolved.\n\n` +
-      `- Complaint Management Team`
-    );
 
+    const subject =
+      updatedComplaint.status === "ESCALATED"
+        ? "Your Complaint Has Been Escalated"
+        : "Update on Your Complaint";
+
+    const body =
+      updatedComplaint.status === "ESCALATED"
+        ? `Hello ${updatedComplaint.reporter.name},\n\nYour complaint titled "${updatedComplaint.title}" has breached the SLA and is now escalated to the hostel admin for faster resolution.\n\nThank you for your patience.\n\n— Complaint Management Team`
+        : `Hello ${updatedComplaint.reporter.name},\n\nYour complaint titled "${updatedComplaint.title}" has been updated to status: ${updatedComplaint.status}.\n\nThank you for your patience.\n\n— Complaint Management Team`;
+
+    await sendEmail(updatedComplaint.reporter.email, subject, body); // added email for escalation
 
     res.json({ message: "Status updated successfully", complaint: updatedComplaint });
+
   } catch (error) {
     console.error("Error updating complaint status:", error);
     res.status(500).json({ error: "Something went wrong" });

@@ -3,7 +3,7 @@ export interface Complaint {
   id: number;
   title?: string;
   description?: string;
-  status: "OPEN" | "IN_PROGRESS" | "RESOLVED";
+  status: "OPEN" | "IN_PROGRESS" | "RESOLVED"|"ESCALATED";
   category?: string;
   area?: string;
   photoUrl?: string;

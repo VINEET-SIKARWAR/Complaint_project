@@ -186,6 +186,8 @@ const AdminDashboard: React.FC = () => {
         </div>
       )}
 
+
+     
       {/* Complaints Table */}
       <div className="bg-white shadow rounded-lg p-6 overflow-x-auto">
         <h3 className="text-lg font-semibold mb-4">All Complaints</h3>
@@ -212,13 +214,17 @@ const AdminDashboard: React.FC = () => {
                 <td className="px-4 py-2 sm:px-4">{c.hostel?.name || "N/A"}</td>
                 <td className="px-4 py-2 sm:px-4">
                   <span
-                    className={`px-2 py-1 rounded text-xs ${c.status === "OPEN"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : c.status === "IN_PROGRESS"
+                   
+                    className={`px-2 py-1 rounded text-xs ${
+                      c.status === "ESCALATED"
+                        ? "bg-red-100 text-red-800 font-bold"
+                        : c.status === "OPEN"
+                        ? "bg-yellow-100 text-yellow-800" 
+                        : c.status === "IN_PROGRESS"
                         ? "bg-blue-100 text-blue-800"
                         : "bg-green-100 text-green-800"
-                      }`}
-                  >
+                    }`}
+                    >
                     {c.status}
                   </span>
                 </td>
@@ -242,7 +248,7 @@ const AdminDashboard: React.FC = () => {
                 </td>
                 <td className="px-4 py-2">
                   {/* Assign Staff Dropdown */}
-                  {c.status === "OPEN" ? (
+                  {(c.status === "OPEN" || c.status === "ESCALATED") ? (
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                       <select
                         onChange={(e) =>
@@ -267,7 +273,7 @@ const AdminDashboard: React.FC = () => {
                         }
                         className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 text-xs sm:text-sm"
                       >
-                        Assign
+                       {c.status === "ESCALATED" ? "Reassign" : "Assign"}
                       </button>
                     </div>
                   ) : (

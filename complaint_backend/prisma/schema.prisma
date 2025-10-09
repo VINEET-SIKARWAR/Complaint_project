@@ -67,11 +67,13 @@ model Complaint {
   hostelId Int?
   hostel   Hostel? @relation(fields: [hostelId], references: [id])
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  resolvedAt    DateTime?
-  slaHours      Int       @default(48)
-  breached      Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  resolvedAt DateTime?
+  slaHours   Int       @default(24)
+  breached   Boolean   @default(false)
+
+  escalated     Boolean @default(false)
   escalatedById Int?
-  escalatedBy   User?     @relation("Escalator", fields: [escalatedById], references: [id])
+  escalatedBy   User?   @relation("Escalator", fields: [escalatedById], references: [id])
 }

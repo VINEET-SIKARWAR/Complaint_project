@@ -156,7 +156,10 @@ router.put("/assign/:complaintId", authenticate, async (req: AuthRequest, res: R
 
     const updatedComplaint = await prisma.complaint.update({
       where: { id: Number(complaintId) },
-      data: { assignedToId: staff.id, status: "IN_PROGRESS" ,},
+      data: {
+        assignedToId: staff.id, status: "IN_PROGRESS", escalated: false,
+        escalatedById: null,
+      },
       include: {
         reporter: { select: { name: true, email: true } },
         assignedTo: { select: { name: true, email: true } },
@@ -175,6 +178,13 @@ router.put("/assign/:complaintId", authenticate, async (req: AuthRequest, res: R
       `Thank you,\nComplaint Management Team`
     );
 
+    
+    //  Send email to reporter about reassignment
+    await sendEmail(
+      updatedComplaint.reporter.email,
+      "Your Complaint Has Been Reassigned",
+      `Hello ${updatedComplaint.reporter.name},\n\nYour complaint titled "${updatedComplaint.title}" has been reassigned to ${staff.name} for resolution.\n\nYou can track progress in your dashboard.\n\n— Complaint Management Team`
+    );
 
     res.json({ message: "Complaint assigned successfully", complaint: updatedComplaint });
   } catch (err) {

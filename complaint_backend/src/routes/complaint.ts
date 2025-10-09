@@ -185,24 +185,24 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
       const createdAt = complaint.createdAt;
       const diffHours = (resolvedAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
 
-      const slaHours = complaint.slaHours ?? 48;
+      const slaHours = complaint.slaHours ?? 24;
       const breached = diffHours > slaHours;
 
 
       dataToUpdate.resolvedAt = resolvedAt;
       dataToUpdate.breached = breached;
 
-      if (breached) {
-        dataToUpdate.escalated = true;
-        dataToUpdate.assignedToId = null; // remove old staff
-        dataToUpdate.status = "ESCALATED"; // mark status
-        dataToUpdate.escalatedById = req.user!.userId; // record who escalated it
-      }
-    } else {
-      dataToUpdate.resolvedAt = null; // optional, clears previous timestamp if reopened
-      dataToUpdate.breached = false;
-      dataToUpdate.escalated = false;
-    }
+      if (breached && !complaint.assignedToId) {
+    dataToUpdate.status = "ESCALATED";
+    dataToUpdate.assignedToId = null;
+    dataToUpdate.escalatedById = req.user!.userId;
+  } else {
+    // Normal successful resolution
+    dataToUpdate.status = "RESOLVED";
+    dataToUpdate.escalated = false;
+    dataToUpdate.escalatedById = null;
+  }
+}
 
     // ADMIN rules → can change to anything
     // (no extra check needed, since citizen already blocked above)

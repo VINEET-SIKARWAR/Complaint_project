@@ -1,10 +1,10 @@
-🧾 Complaint Management System
+## 🧾 Complaint Management System
 
 A full-stack web application for managing student complaints across multiple hostels at college — built during Hackathon 2025.
 This system enables students to file complaints, staff to resolve them, and admins to assign and monitor issues efficiently.
 
-⚙️ Tech Stack
-🖥 Frontend
+## ⚙️ Tech Stack
+### 🖥 Frontend
 
 React (Vite) + TypeScript
 
@@ -12,7 +12,7 @@ Axios (API calls)
 
 Tailwind CSS (UI styling)
 
-⚙️ Backend
+### ⚙️ Backend
 
 Express (Node.js) + TypeScript
 
@@ -26,9 +26,9 @@ Zod (Validation)
 
 json2csv (CSV report export)
 
-📁 Project Structure
-Backend (complaint_backend/)
-complaint_backend/
+**📁 Project Structure**
+***Backend (complaint_backend/)***
+***complaint_backend/***
 -| ├── prisma/
 -| │   ├── migrations/         # Database migrations
 -| │   ├── schema.prisma       # Prisma schema
@@ -40,8 +40,8 @@ complaint_backend/
 -| │   └── index.ts            # Entry point
 -| └── package.json
 
-Frontend (complaint_frontend/)
-complaint_frontend/
+***Frontend (complaint_frontend/)***
+***complaint_frontend/***
 -| ├── src/
 -| │   ├── api/                # Axios instance with JWT
 -| │   ├── components/         # Reusable UI components

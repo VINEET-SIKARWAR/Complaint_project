@@ -26,9 +26,9 @@ Zod (Validation)
 
 json2csv (CSV report export)
 
-**📁 Project Structure**
-***Backend (complaint_backend/)***
-***complaint_backend/***
+- **📁 Project Structure**
+- ***Backend (complaint_backend/)***
+- ***complaint_backend/***
 -| ├── prisma/
 -| │   ├── migrations/         # Database migrations
 -| │   ├── schema.prisma       # Prisma schema
@@ -40,8 +40,8 @@ json2csv (CSV report export)
 -| │   └── index.ts            # Entry point
 -| └── package.json
 
-***Frontend (complaint_frontend/)***
-***complaint_frontend/***
+- ***Frontend (complaint_frontend/)***
+- ***complaint_frontend/***
 -| ├── src/
 -| │   ├── api/                # Axios instance with JWT
 -| │   ├── components/         # Reusable UI components

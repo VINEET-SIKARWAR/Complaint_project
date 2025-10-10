@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import API from "../api/axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 const Register: React.FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState<{
         name: string;
         email: string;
@@ -106,6 +107,7 @@ const Register: React.FC = () => {
                 hostelId: "",
             });
             setErrors({});
+            navigate("/login");
         } catch (err: any) {
             // Handle backend Zod validation errors
             if (err.response?.data?.errors) {
@@ -301,8 +303,8 @@ const Register: React.FC = () => {
                 {message && (
                     <p
                         className={`mt-3 text-center text-sm ${message.toLowerCase().includes("invalid")
-                                ? "text-red-600"
-                                : "text-green-600"
+                            ? "text-red-600"
+                            : "text-green-600"
                             }`}
 
                     >

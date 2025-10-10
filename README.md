@@ -1,102 +1,63 @@
-Complaint Management System
+🧾 Complaint Management System
 
-A full-stack web application to manage student complaints across multiple hostels in college. Built during Hackathon 2025 using React, Node.js, TypeScript, Prisma, and PostgreSQL.
+A full-stack web application for managing student complaints across multiple hostels at college — built during Hackathon 2025.
+This system enables students to file complaints, staff to resolve them, and admins to assign and monitor issues efficiently.
 
-This system allows students to file complaints, track their status, and enables staff and admins to manage, assign, and resolve complaints efficiently.
+⚙️ Tech Stack
+🖥 Frontend
 
-⚡ Tech Stack
+React (Vite) + TypeScript
 
-Frontend:
+Axios (API calls)
 
-React (Vite)
+Tailwind CSS (UI styling)
 
-TypeScript
+⚙️ Backend
 
-Axios
-
-Tailwind CSS
-
-Backend:
-
-Express (Node.js)
-
-TypeScript
+Express (Node.js) + TypeScript
 
 Prisma ORM (PostgreSQL)
 
-JWT + bcrypt (authentication & authorization)
+JWT + bcryptjs (Authentication & Authorization)
 
-Multer + Cloudinary (file uploads & storage)
+Multer + Cloudinary (Image upload & storage)
 
-Zod (runtime request validation)
+Zod (Validation)
 
-json2csv (report export)
+json2csv (CSV report export)
 
-**📂 Project Structure**
-- Backend (complaint_backend/)
-- complaint_backend/
-- ├── prisma/
-- │   ├── migrations/           # DB migrations
-- │   ├── schema.prisma         # Prisma schema
-- │   └── seed.ts               # Hostel seeding
-- ├── src/
-- │   ├── config/               # Config files
-- │   │   ├── cloudinary.ts
-- |   |   ├── mailer.ts
-- │   │   └── multer.ts
-- │    ├── middlewares/
-- │   │   └── auth.ts           # JWT auth middleware
-- │   ├── routes/               # Express routes
-- │   │   ├── admin.ts
-- │   │   ├── auth.ts
-- │   │   ├── complaint.ts
-- │   │   ├── hostel.ts
-- │   │   ├── report.ts
-- │   │   └── user.ts
-- │   └── index.ts              # App entry point
-- ├── package.json
-- └── tsconfig.json
+📁 Project Structure
+Backend (complaint_backend/)
+complaint_backend/
+├── prisma/
+│   ├── migrations/         # Database migrations
+│   ├── schema.prisma       # Prisma schema
+│   └── seed.ts             # Hostel seeding script
+├── src/
+│   ├── config/             # Configuration (Mailer, Cloudinary, Multer)
+│   ├── middlewares/        # Authentication middleware
+│   ├── routes/             # API routes (auth, admin, complaint, etc.)
+│   └── index.ts            # Entry point
+└── package.json
 
 Frontend (complaint_frontend/)
 complaint_frontend/
-- ├── public/
-- ├── src/
-- │   ├── api/
-- │   │   └── axios.ts          # Axios instance with JWT
-- │   ├── components/           # Reusable UI
-- │   │   ├── ComplaintActions.tsx
-- |   |   ├── ComplaintHeatmap.tsx
-- │   │   ├── ImageModal.tsx
-- │   │   ├── ProfileCard.tsx
-- │   │   └── StaffRequestCard.tsx
-- │   ├── pages/                # Pages (per role)
-- │   │   ├── AdminDashboard.tsx
-- │   │   ├── AssignedComplaints.tsx
-- │   │   ├── ChiefAdminDashboard.tsx
-- │   │   ├── Dashboard.tsx     # Citizen
-- │   │   ├── Login.tsx
-- │   │   ├── NewComplaint.tsx
-- │   │   ├── Register.tsx
-- │   │   └── StaffDashboard.tsx
-- │   ├── types/
-- │   │   └── Complaint.ts      # Shared types
-- │   ├── App.tsx
-- │   ├── index.css
-- │   └── main.tsx
-- ├── package.json
-- └── tsconfig.json
+├── src/
+│   ├── api/                # Axios instance with JWT
+│   ├── components/         # Reusable UI components
+│   ├── pages/              # Role-based dashboards
+│   ├── types/              # Shared TypeScript types
+│   └── main.tsx            # App entry
+└── package.json
 
-🔧 Setup Instructions
-Backend
-
-Clone & install dependencies
-
+⚡ Quick Start
+🧩 Backend Setup
 git clone https://github.com/VINEET-SIKARWAR/Complaint_project.git
 cd complaint_backend
 npm install
 
 
-Configure .env
+Configure environment:
 
 DATABASE_URL="postgresql://..."
 JWT_SECRET="supersecret"
@@ -109,69 +70,57 @@ CLOUDINARY_API_KEY="your-api-key"
 CLOUDINARY_API_SECRET="your-api-secret"
 
 
-Run migrations & seed hostels
+Run database setup:
 
 npx prisma migrate dev --name init
 npm run seed
 
 
-Start server
+Start server:
 
 npm run dev
 
-Frontend
-
-Open a new terminal
-
+💻 Frontend Setup
 cd complaint_frontend
 npm install
 npm run dev
 
-👤 Roles & Dashboards
-👤 Roles & Dashboards
+👥 User Roles
+Role	Capabilities
+Citizen (Student)	File & track complaints with photos
+Staff	View assigned complaints, mark as In Progress or Resolved
+Admin (Warden)	Approve staff, assign complaints, manage hostel issues
+Chief Admin	View all hostels, download reports, oversee admins
+🧠 Core Features
 
-Citizen (Student)
+📸 Image Uploads (via Cloudinary)
 
-Register/Login
+🔐 Role-based Access Control
 
-File new complaints with photo
+🏠 Multi-Hostel Complaint Management
 
-Track own complaints
+👥 Staff Request & Promotion Workflow
 
-Staff
+📊 CSV Report Export (Chief Admin)
 
-Get complaints assigned by Admin
+🗺️ Heatmap Visualization (Admin & Chief Admin dashboards)
 
-Update complaint status (In Progress / Resolved)
+⏱️ SLA Tracking (24-hour escalation alert)
 
-Admin (Warden)
+📧 Email Notifications on complaint status updates
 
-Manage complaints of their hostel
-
-Promote/reject staff requests
-
-Assign complaints to staff
-
-Chief Admin
-
-View & filter complaints from all hostels
-
-Download CSV reports
-
-Manage admins/wardens
-
-🛠 API Endpoints
+📡 API Overview
 Auth
 
-POST /api/auth/register – Register user (citizen, staff, admin, chief_admin)
+POST /api/auth/register – Register new user
 
-POST /api/auth/login – Login & get JWT
+POST /api/auth/login – User login & JWT issue
 
 Complaints
 
 POST /api/complaints/me – Create complaint
 
-GET /api/complaints – Get complaints (role-based filtering)
+GET /api/complaints – Get complaints (filtered by role)
 
 PUT /api/complaints/:id/status – Update status
 
@@ -179,55 +128,31 @@ DELETE /api/complaints/:id – Delete complaint
 
 Admin
 
-GET /api/admin/staff-requests – See pending staff requests
+GET /api/admin/staff-requests – View pending staff requests
 
-PUT /api/admin/promote/:userId – Approve staff request
+PUT /api/admin/promote/:userId – Approve staff
 
-PUT /api/admin/reject/:userId – Reject staff request
+PUT /api/admin/reject/:userId – Reject staff
 
-PUT /api/admin/assign/:complaintId – Assign complaint to staff
-
-Hostels
-
-GET /api/hostel – List all hostels
-
-GET /api/hostel/:id/complaints – Get complaints of specific hostel
+PUT /api/admin/assign/:complaintId – Assign to staff
 
 Reports
 
-GET /api/reports/csv – Export complaints as CSV
-GET /api/reports/heatmap-export heatmap data
-GET /api/reports/sla-export SLA data
+GET /api/reports/csv – Download CSV report
 
-📸 Features
+GET /api/reports/heatmap-export – Get heatmap data
 
-File uploads with Cloudinary
+GET /api/reports/sla-export – Get SLA data
 
-Role-based complaint access
+🚀 Future Enhancements
 
-Multi-hostel management
+📈 Analytics dashboard
 
-Staff request & promotion workflow
+🔍 Advanced filters & search
 
-Chief Admin CSV report download
+📱 Mobile app (React Native)
 
-Filter complaints by hostel (Chief Admin Dashboard)
 
-Email notification send to the citizen on status update
-
-Heatmap Visualization-Admin and chief_admin can view the heatmap of complaints.
-
-SLA Tracking of complaints
-
-Roadmap
-
-Analytics dashboard
-
-Advanced search/filter
-
-Mobile app (React Native)
-
-Authors
-
+Author
 Hackathon Project 2025 – Team Void
 Vineet Sikarwar

@@ -23,6 +23,8 @@ const Register: React.FC = () => {
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [hostels, setHostels] = useState<{ id: number; name: string }[]>([]);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         const fetchHostels = async () => {
             try {
@@ -82,6 +84,7 @@ const Register: React.FC = () => {
 
         if (!validateForm()) return; // stop if frontend validation fails
         try {
+            setLoading(true);
             const payload = {
                 ...formData,
                 hostelId: formData.hostelId ? Number(formData.hostelId) : undefined,
@@ -113,8 +116,11 @@ const Register: React.FC = () => {
                 setErrors(newErrors);
             } else {
                 setMessage(err.response?.data?.error || "Something went wrong");
+                setErrors({ email: "Invalid credentials", password: "Invalid credentials" });
             }
 
+        } finally {
+            setLoading(false);
         };
     }
 
@@ -123,6 +129,11 @@ const Register: React.FC = () => {
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-50">
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-60 z-50">
+                    <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            )}
             <form
                 onSubmit={handleSubmit}
                 className="bg-white shadow-lg rounded-lg p-8 w-full max-w-lg space-y-6"
@@ -143,7 +154,8 @@ const Register: React.FC = () => {
                         placeholder="Enter your name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className={`mt-1 block w-full rounded-md px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border ${errors.name ? "border-red-500" : "border-gray-300"
+                            }`}
                         required
                     />
                 </div>
@@ -159,7 +171,8 @@ const Register: React.FC = () => {
                         placeholder="Enter your email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className={`mt-1 block w-full rounded-md px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border ${errors.email ? "border-red-500" : "border-gray-300"
+                            }`}
                         required
                     />
                 </div>
@@ -175,7 +188,8 @@ const Register: React.FC = () => {
                         placeholder="Enter your password"
                         value={formData.password}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className={`mt-1 block w-full rounded-md px-3 py-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border ${errors.password ? "border-red-500" : "border-gray-300"
+                            }`}
                         required
                     />
                     {errors.password && (
@@ -281,13 +295,22 @@ const Register: React.FC = () => {
                 {/* Submit */}
                 <button
                     type="submit"
+                    disabled={loading}
                     className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-semibold shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                    Register
+                    {loading ? "Registering..." : "Register"}
                 </button>
 
                 {message && (
-                    <p className="mt-3 text-center text-sm text-gray-600">{message}</p>
+                    <p
+                        className={`mt-3 text-center text-sm ${message.toLowerCase().includes("invalid")
+                                ? "text-red-600"
+                                : "text-green-600"
+                            }`}
+
+                    >
+                        {message}
+                    </p>
                 )}
                 <p className="mt-4 text-sm text-center">
                     Already have an account?{" "}

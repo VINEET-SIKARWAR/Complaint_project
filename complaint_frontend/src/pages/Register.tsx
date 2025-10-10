@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from "../api/axios";
 import { Link } from "react-router-dom";
+import Loader from "../components/Loader";
 const Register: React.FC = () => {
     const [formData, setFormData] = useState<{
         name: string;
@@ -129,11 +130,7 @@ const Register: React.FC = () => {
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-50">
-            {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-60 z-50">
-                    <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            )}
+            {loading && <Loader />}
             <form
                 onSubmit={handleSubmit}
                 className="bg-white shadow-lg rounded-lg p-8 w-full max-w-lg space-y-6"

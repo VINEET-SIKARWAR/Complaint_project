@@ -1,4 +1,4 @@
-## 🧾 Complaint Management System
+# 🧾 Complaint Management System
 
 A full-stack web application for managing student complaints across multiple hostels at college — built during **Hackathon 2025**.  
 This system enables students to file complaints, staff to resolve them, and admins to assign and monitor issues efficiently.

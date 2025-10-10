@@ -10,18 +10,22 @@ const Login: React.FC = () => {
     password: "",
   });
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+    setMessage("");
 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
+    setErrors({});
     setLoading(true);
     try {
       const res = await API.post("/auth/login", formData);
@@ -46,12 +50,20 @@ const Login: React.FC = () => {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      setMessage(err.response?.data?.error || "Invalid credentials");
+
+      if (err.response?.data?.error) {
+        setMessage(err.response.data.error);
+        setErrors({
+          email: "Invalid credentials",
+          password: "Invalid credentials",
+        });
+      } else {
+        setMessage("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
-};
-
+  };
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       {loading && <Loader />}
@@ -67,9 +79,10 @@ const Login: React.FC = () => {
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          className="border rounded w-full py-2 px-3 mb-3"
+          className={`border rounded w-full py-2 px-3 mb-1 ${errors.email ? "border-red-500" : ""}`}
           required
         />
+          {errors.email && <p className="text-red-500 text-xs mb-2">{errors.email}</p>}
 
         <input
           type="password"
@@ -77,9 +90,10 @@ const Login: React.FC = () => {
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          className="border rounded w-full py-2 px-3 mb-3"
+         className={`border rounded w-full py-2 px-3 mb-1 ${errors.password ? "border-red-500" : ""}`}
           required
         />
+         {errors.password && <p className="text-red-500 text-xs mb-2">{errors.password}</p>}
 
         <button
           type="submit"

@@ -1,33 +1,30 @@
 ## 🧾 Complaint Management System
 
-A full-stack web application for managing student complaints across multiple hostels at college — built during Hackathon 2025.
+A full-stack web application for managing student complaints across multiple hostels at college — built during **Hackathon 2025**.  
 This system enables students to file complaints, staff to resolve them, and admins to assign and monitor issues efficiently.
 
+---
+
 ## ⚙️ Tech Stack
-### 🖥 Frontend
 
-React (Vite) + TypeScript
-
-Axios (API calls)
-
-Tailwind CSS (UI styling)
+### 🖥️ Frontend
+- React (Vite) + TypeScript  
+- Axios (API calls)  
+- Tailwind CSS (UI styling)
 
 ### ⚙️ Backend
+- Express (Node.js) + TypeScript  
+- Prisma ORM (PostgreSQL)  
+- JWT + bcryptjs (Authentication & Authorization)  
+- Multer + Cloudinary (Image upload & storage)  
+- Zod (Validation)  
+- json2csv (CSV report export)
 
-Express (Node.js) + TypeScript
+---
 
-Prisma ORM (PostgreSQL)
+## 📁 Project Structure
 
-JWT + bcryptjs (Authentication & Authorization)
-
-Multer + Cloudinary (Image upload & storage)
-
-Zod (Validation)
-
-json2csv (CSV report export)
-
-- **📁 Project Structure**
-- ***Backend (complaint_backend/)***
+### 🖥️ Backend (`complaint_backend/`)
 complaint_backend/
 ├── prisma/
 │ ├── migrations/ # Database migrations
@@ -40,7 +37,10 @@ complaint_backend/
 │ └── index.ts # Entry point
 └── package.json
 
-- ***Frontend (complaint_frontend/)***
+shell
+Copy code
+
+### 💻 Frontend (`complaint_frontend/`)
 complaint_frontend/
 ├── src/
 │ ├── api/ # Axios instance with JWT
@@ -50,15 +50,21 @@ complaint_frontend/
 │ └── main.tsx # App entry
 └── package.json
 
-⚡ Quick Start
-🧩 Backend Setup
+yaml
+Copy code
+
+---
+
+## ⚡ Quick Start
+
+### 🧩 Backend Setup
+```bash
 git clone https://github.com/VINEET-SIKARWAR/Complaint_project.git
 cd complaint_backend
 npm install
-
-
 Configure environment:
-
+env
+Copy code
 DATABASE_URL="postgresql://..."
 JWT_SECRET="supersecret"
 ADMIN_CODE="warden-secret"
@@ -68,31 +74,29 @@ CHIEF_ADMIN_CODE="chief-secret"
 CLOUDINARY_CLOUD_NAME="your-cloud-name"
 CLOUDINARY_API_KEY="your-api-key"
 CLOUDINARY_API_SECRET="your-api-secret"
-
-
 Run database setup:
-
+bash
+Copy code
 npx prisma migrate dev --name init
 npm run seed
-
-
 Start server:
-
+bash
+Copy code
 npm run dev
-
 💻 Frontend Setup
+bash
+Copy code
 cd complaint_frontend
 npm install
 npm run dev
-
 👥 User Roles
 Role	Capabilities
 Citizen (Student)	File & track complaints with photos
 Staff	View assigned complaints, mark as In Progress or Resolved
 Admin (Warden)	Approve staff, assign complaints, manage hostel issues
 Chief Admin	View all hostels, download reports, oversee admins
-🧠 Core Features
 
+🧠 Core Features
 📸 Image Uploads (via Cloudinary)
 
 🔐 Role-based Access Control
@@ -110,14 +114,12 @@ Chief Admin	View all hostels, download reports, oversee admins
 📧 Email Notifications on complaint status updates
 
 📡 API Overview
-Auth
-
+🔑 Auth
 POST /api/auth/register – Register new user
 
 POST /api/auth/login – User login & JWT issue
 
-Complaints
-
+🧾 Complaints
 POST /api/complaints/me – Create complaint
 
 GET /api/complaints – Get complaints (filtered by role)
@@ -126,8 +128,7 @@ PUT /api/complaints/:id/status – Update status
 
 DELETE /api/complaints/:id – Delete complaint
 
-Admin
-
+🧑‍💼 Admin
 GET /api/admin/staff-requests – View pending staff requests
 
 PUT /api/admin/promote/:userId – Approve staff
@@ -136,8 +137,7 @@ PUT /api/admin/reject/:userId – Reject staff
 
 PUT /api/admin/assign/:complaintId – Assign to staff
 
-Reports
-
+📊 Reports
 GET /api/reports/csv – Download CSV report
 
 GET /api/reports/heatmap-export – Get heatmap data
@@ -145,14 +145,12 @@ GET /api/reports/heatmap-export – Get heatmap data
 GET /api/reports/sla-export – Get SLA data
 
 🚀 Future Enhancements
-
 📈 Analytics dashboard
 
 🔍 Advanced filters & search
 
 📱 Mobile app (React Native)
 
-
-Author
+👨‍💻 Author
 Hackathon Project 2025 – Team Void
-Vineet Sikarwar
+👤 Vineet Sikarwar

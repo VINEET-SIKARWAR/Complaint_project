@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 
 interface Hostel {
@@ -15,6 +16,7 @@ const NewComplaint: React.FC = () => {
   const [hostelId, setHostelId] = useState<number | "">("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [hostels, setHostels] = useState<Hostel[]>([]);
   const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ const NewComplaint: React.FC = () => {
   useEffect(() => {
     const fetchHostels = async () => {
       try {
-        const res = await API.get("/hostel"); 
+        const res = await API.get("/hostel");
         setHostels(res.data);
       } catch (err: any) {
         console.error("Failed to load hostels:", err);
@@ -49,6 +51,8 @@ const NewComplaint: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const formData = new FormData();
@@ -66,11 +70,14 @@ const NewComplaint: React.FC = () => {
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to register complaint");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="p-6 max-w-xl mx-auto bg-white shadow rounded-lg">
+      {loading && <Loader />}
       <h2 className="text-xl font-bold mb-4">Register a Complaint</h2>
       {error && <p className="text-red-500 mb-2">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,7 +106,7 @@ const NewComplaint: React.FC = () => {
         />
         <input
           type="text"
-          placeholder="Area"
+          placeholder="Area e.g(Mess,Sanitation,....)"
           value={area}
           onChange={(e) => setArea(e.target.value)}
           className="w-full border p-2 rounded"
@@ -137,7 +144,7 @@ const NewComplaint: React.FC = () => {
           type="submit"
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          Submit
+          {loading ? "Submitting..." : "Submit"}
         </button>
       </form>
     </div>

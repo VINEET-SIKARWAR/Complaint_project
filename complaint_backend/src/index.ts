@@ -9,9 +9,9 @@ const app = express()
 const PORT = process.env.PORT
 const allowedOrigins = [
   "http://localhost:5173", //Vite dev server
-  "https://complaint-project-mnnit.vercel.app", // main frontend
-  "https://complaint-project-mnnit-git-main-vineet-sikarwars-projects.vercel.app",
-  "https://complaint-project-mnnit-i2x886ctd-vineet-sikarwars-projects.vercel.app"
+  "https://complaint-project-nine.vercel.app", // main frontend
+  "https://complaint-project-git-main-vineet-sikarwars-projects.vercel.app",
+  "https://complaint-project-lih23dtyd-vineet-sikarwars-projects.vercel.app"
 ];
 
 app.use(cors({

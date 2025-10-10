@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import API from "../api/axios";
 import { Link, useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,14 +11,18 @@ const Login: React.FC = () => {
   });
 
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage("");
+    setLoading(true);
     try {
       const res = await API.post("/auth/login", formData);
       setMessage(res.data.message);
@@ -31,22 +36,25 @@ const Login: React.FC = () => {
       localStorage.setItem("token", res.data.token);
 
       // redirect to dashboard or home
-       if (res.data.user.role === "admin") {
+      if (res.data.user.role === "admin") {
         navigate("/admin-dashboard");
-      }else if(res.data.user.role==="staff"){
+      } else if (res.data.user.role === "staff") {
         navigate("/staff-dashboard");
-      }else if(res.data.user.role==="chief_admin"){
+      } else if (res.data.user.role === "chief_admin") {
         navigate("/chief_admin-dashboard");
-      }else {
+      } else {
         navigate("/dashboard");
       }
     } catch (err: any) {
       setMessage(err.response?.data?.error || "Invalid credentials");
+    } finally {
+      setLoading(false);
     }
-  };
+};
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      {loading && <Loader />}
       <form
         onSubmit={handleSubmit}
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 w-full max-w-md"
@@ -75,12 +83,18 @@ const Login: React.FC = () => {
 
         <button
           type="submit"
+          disabled={loading}
           className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-semibold shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
-        {message && <p className="mt-3 text-center text-sm">{message}</p>}
+        {message && <p
+          className={`mt-3 text-center text-sm ${message.toLowerCase().includes("invalid")
+            ? "text-red-600"
+            : "text-green-600"
+            }`}
+        >{message}</p>}
 
         <p className="mt-4 text-sm text-center">
           Don’t have an account?{" "}

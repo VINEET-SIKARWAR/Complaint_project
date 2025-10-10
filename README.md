@@ -29,26 +29,26 @@ json2csv (CSV report export)
 📁 Project Structure
 Backend (complaint_backend/)
 complaint_backend/
-├── prisma/
-| -│   ├── migrations/         # Database migrations
-| -│   ├── schema.prisma       # Prisma schema
-| -│   └── seed.ts             # Hostel seeding script
-| -├── src/
-| -│   ├── config/             # Configuration (Mailer, Cloudinary, Multer)
-| -│   ├── middlewares/        # Authentication middleware
-| -│   ├── routes/             # API routes (auth, admin, complaint, etc.)
-| -│   └── index.ts            # Entry point
-| -└── package.json
+-| ├── prisma/
+-| │   ├── migrations/         # Database migrations
+-| │   ├── schema.prisma       # Prisma schema
+-| │   └── seed.ts             # Hostel seeding script
+-| ├── src/
+-| │   ├── config/             # Configuration (Mailer, Cloudinary, Multer)
+-| │   ├── middlewares/        # Authentication middleware
+-| │   ├── routes/             # API routes (auth, admin, complaint, etc.)
+-| │   └── index.ts            # Entry point
+-| └── package.json
 
 Frontend (complaint_frontend/)
 complaint_frontend/
-| -├── src/
-| -│   ├── api/                # Axios instance with JWT
-| -│   ├── components/         # Reusable UI components
-| -│   ├── pages/              # Role-based dashboards
-| -│   ├── types/              # Shared TypeScript types
-| -│   └── main.tsx            # App entry
-| -└── package.json
+-| ├── src/
+-| │   ├── api/                # Axios instance with JWT
+-| │   ├── components/         # Reusable UI components
+-| │   ├── pages/              # Role-based dashboards
+-| │   ├── types/              # Shared TypeScript types
+-| │   └── main.tsx            # App entry
+-| └── package.json
 
 ⚡ Quick Start
 🧩 Backend Setup

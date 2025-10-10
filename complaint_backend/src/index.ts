@@ -10,9 +10,11 @@ const PORT = process.env.PORT
 
 // Middleware
 app.use(cors({
-  origin: ["https://complaint-project-mnnit.vercel.app/"], 
-  credentials: true
+  origin: "https://complaint-project-mnnit.vercel.app", 
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true 
 }));
+
 app.use(express.json())               // Parse JSON body
 app.use("/uploads", express.static("uploads")) // Serve uploaded images
 

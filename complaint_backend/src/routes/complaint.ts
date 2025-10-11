@@ -17,6 +17,13 @@ export const updateStatusSchema = z.object({
 
 router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest, res: Response) => {
   try {
+    console.log("===== NEW COMPLAINT REQUEST =====");
+    console.log("User:", req.user); // check logged-in user
+    console.log("Body:", req.body);
+    console.log("File:", req.file);
+
+    
+
     const { title, description, category, area, hostelId } = req.body;
     const photoUrl = req.file?.path; // Cloudinary gives URL in .path
 

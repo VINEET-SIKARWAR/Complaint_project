@@ -65,6 +65,7 @@ const NewComplaint: React.FC = () => {
 
       await API.post("/complaints/me", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
       });
 
       navigate("/dashboard");

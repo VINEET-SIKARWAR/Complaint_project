@@ -81,8 +81,8 @@ router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest
 
     res.status(201).json({ message: "Complaint created", complaint });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("Error creating complaint:", error);
+    res.status(500).json({ error: "Something went wrong", details: error instanceof Error ? error.message : error });
   }
 });
 

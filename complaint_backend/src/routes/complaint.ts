@@ -15,14 +15,14 @@ export const updateStatusSchema = z.object({
   status: z.enum(["OPEN", "IN_PROGRESS", "RESOLVED"]),
 });
 
-router.post("/me", authenticate, upload.single("photo"), async (req: AuthRequest, res: Response) => {
+router.post("/me", upload.single("photo"), authenticate, async (req: AuthRequest, res: Response) => {
   try {
     console.log("===== NEW COMPLAINT REQUEST =====");
     console.log("User:", req.user); // check logged-in user
     console.log("Body:", req.body);
     console.log("File:", req.file);
 
-    
+
 
     const { title, description, category, area, hostelId } = req.body;
     const photoUrl = req.file?.path; // Cloudinary gives URL in .path
@@ -200,16 +200,16 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
       dataToUpdate.breached = breached;
 
       if (breached && !complaint.assignedToId) {
-    dataToUpdate.status = "ESCALATED";
-    dataToUpdate.assignedToId = null;
-    dataToUpdate.escalatedById = req.user!.userId;
-  } else {
-    // Normal successful resolution
-    dataToUpdate.status = "RESOLVED";
-    dataToUpdate.escalated = false;
-    dataToUpdate.escalatedById = null;
-  }
-}
+        dataToUpdate.status = "ESCALATED";
+        dataToUpdate.assignedToId = null;
+        dataToUpdate.escalatedById = req.user!.userId;
+      } else {
+        // Normal successful resolution
+        dataToUpdate.status = "RESOLVED";
+        dataToUpdate.escalated = false;
+        dataToUpdate.escalatedById = null;
+      }
+    }
 
     // ADMIN rules → can change to anything
     // (no extra check needed, since citizen already blocked above)

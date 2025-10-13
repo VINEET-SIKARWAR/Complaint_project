@@ -7,7 +7,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // Get all hostels
-router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
+router.get("/", async (req: AuthRequest, res: Response) => {
   try {
     const hostels = await prisma.hostel.findMany({
       select: { id: true, name: true },

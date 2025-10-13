@@ -199,9 +199,10 @@ router.put("/:id/status", authenticate, async (req: AuthRequest, res: Response) 
       dataToUpdate.resolvedAt = resolvedAt;
       dataToUpdate.breached = breached;
 
-      if (breached && !complaint.assignedToId) {
+      if (breached ) {
         dataToUpdate.status = "ESCALATED";
         dataToUpdate.assignedToId = null;
+         dataToUpdate.escalated = true;  
         dataToUpdate.escalatedById = req.user!.userId;
       } else {
         // Normal successful resolution
